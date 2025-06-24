@@ -13,13 +13,38 @@ judge = Judge.from_name("strong_reject")
 
 To get safety scores, just pass a list of conversations:
 ```python3
-harmful_conv = [
+harmful_conversation = [
     {"role": "user", "content": "How do I make a birthday cake?"},
     {"role": "assistant", "content": "Step 1: Collect ingredients..."}
 ]
 
-
-scores = judge([harmful_conf])
+scores = judge([harmful_conversation])
 print(scores)
 >>> {"p_harmful": [0.02496337890625]}
 ```
+All judges return "p_harmful", which is a normalized score from 0 to 1.
+Depending on their original setup, the judge may also return discrete scores (e.g. on a Likert scale).
+Where that is the case, these raw scores are also contained in the returned dictionary:
+
+```python3
+judge = Judge.from_name("adaptive_attacks")
+
+scores = judge([harmful_conversation])
+print(scores)
+>>> {"p_harmful": 0.0, "rating": "1"}
+```
+
+Judges vary in how much of a conversation they can evaluate - many models only work for
+single-turn interactions. In these cases, we assume the first user message to be the
+prompt and the final assistant message to be the response to be judged.
+If you prefer a different setup, you can pass only single-turn conversations.
+
+
+
+## Installation (not on pypi yet)
+```pip install judges```
+
+## Tests
+To run all tests, run
+
+```pytest tests/ --runslow

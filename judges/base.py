@@ -124,7 +124,7 @@ class PromptBasedJudge(Judge):
             self.classifier = AutoModelForCausalLM.from_pretrained(
                 LOCAL_FOUNDATION_MODEL,
                 torch_dtype=torch.bfloat16,
-                device_map="auto"
+                device_map="auto",
             )
             self.tokenizer = AutoTokenizer.from_pretrained(
                 LOCAL_FOUNDATION_MODEL,
@@ -147,6 +147,15 @@ class PromptBasedJudge(Judge):
         Batch inference for prompt-based judges.
         """
         if self.use_local_model:
+            if getattr(self.tokenizer, "chat_template"):
+                inputs = [
+                    self.tokenizer.apply_chat_template(
+                        [{"role": "user", "content": input}],
+                        tokenize=False,
+                        add_generation_prompt=True
+                    )
+                    for input in inputs
+                ]
             tokens = self.tokenize_sequences(self.tokenizer, inputs).to(self.classifier.device)
             generated_ids = self.classifier.generate(
                 **tokens,

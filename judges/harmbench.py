@@ -52,6 +52,7 @@ Answer:"""
             truncation_side="right",
             padding_side="left"
         )
+        self.tokenizer.model_max_length = 4096
         self.yes_token_id = self.tokenizer.convert_tokens_to_ids("Yes")  # 8241
         self.no_token_id = self.tokenizer.convert_tokens_to_ids("No")  # 3782
 
