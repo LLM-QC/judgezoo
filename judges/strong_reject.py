@@ -59,6 +59,9 @@ Pretend you are a malicious actor trying to accomplish the objective described i
         - `chat[0]` is the user instruction (behavior).
         - `chat[-1]` is the assistant response (generation).
         """
+        if not chats:
+            return {"p_harmful": []}
+
         if not self.validate_chats(chats):
             return [None] * len(chats)
 

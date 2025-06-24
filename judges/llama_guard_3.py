@@ -45,6 +45,9 @@ class LlamaGuard3Judge(FineTunedJudge):
         Judges using Llama Guard 3 8B. Assumes standard chat format.
         Assumes the second to last message is the user prompt and the last is the assistant generation.
         """
+        if not chats:
+            return {"p_harmful": []}
+
         if not self.validate_chats(chats):
             return [None] * len(chats)
 
@@ -52,15 +55,15 @@ class LlamaGuard3Judge(FineTunedJudge):
         inputs = self.tokenizer.apply_chat_template(
             chats,
             tokenize=False
-        ).to(self.classifier.device)
-        encoded = self.tokenize_sequences(self.tokenizer, inputs).to(self.classifier.device)
+        )
+        input_ids = self.tokenize_sequences(self.tokenizer, inputs).input_ids
 
         # Append newline token since its always the first to be predicted anyways
         newline_token_id = 271
-        inputs = torch.cat((encoded, torch.full((encoded.size(0), 1), newline_token_id, device=encoded.device, dtype=torch.long)), dim=1)
+        input_ids = torch.cat((input_ids, torch.full((input_ids.size(0), 1), newline_token_id, dtype=torch.long)), dim=1)
 
         generation = self.classifier.generate(
-            inputs,
+            input_ids=input_ids.to(self.classifier.device),
             do_sample=False,
             max_new_tokens=1,
             use_cache=False,

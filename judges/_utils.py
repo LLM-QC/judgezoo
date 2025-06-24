@@ -36,6 +36,9 @@ def with_max_batchsize(
 
     # Verify all inputs have the same length
     input_length = len(inputs[0])
+    if input_length == 0:
+        return []
+
     for i, inp in enumerate(inputs[1:], 1):
         if len(inp) != input_length:
             raise ValueError(

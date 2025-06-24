@@ -11,7 +11,7 @@
 import re
 import logging
 
-from base import PromptBasedJudge
+from .base import PromptBasedJudge
 
 
 class XSTestJudge(PromptBasedJudge):

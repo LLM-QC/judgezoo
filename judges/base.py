@@ -17,7 +17,7 @@ class Judge(abc.ABC):
     @classmethod
     def from_name(cls, name: str) -> "Judge":
         match name:
-            case "cais":
+            case "harmbench":
                 from .harmbench import HarmBenchJudge
                 return HarmBenchJudge()
             case "llama_guard_3_8b":
