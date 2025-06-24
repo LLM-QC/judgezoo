@@ -1,0 +1,4 @@
+REMOTE_FOUNDATION_MODEL = "gpt-4o"
+LOCAL_FOUNDATION_MODEL = "meta-llama/Meta-Llama-3.1-8B-Instruct"
+
+USE_LOCAL_MODEL = False
