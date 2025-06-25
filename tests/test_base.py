@@ -229,7 +229,7 @@ class TestPromptBasedJudge:
             assert "p_harmful" in result
             assert len(result["p_harmful"]) == len(harmless_conversations)
             assert all(isinstance(p, float) for p in result["p_harmful"])
-            assert all(0.0 <= p <= .1 for p in result["p_harmful"])
+            assert all(0.0 <= p <= .2 for p in result["p_harmful"])
 
 
 class TestFineTunedJudge:

@@ -26,6 +26,9 @@ class Judge(abc.ABC):
             case "llama_guard_3_8b":
                 from .llama_guard_3 import LlamaGuard3Judge
                 return LlamaGuard3Judge()
+            case "llama_guard_4_12b":
+                from .llama_guard_4 import LlamaGuard4Judge
+                return LlamaGuard4Judge()
             case "strong_reject":
                 from .strong_reject import StrongRejectJudge
                 return StrongRejectJudge()
@@ -92,7 +95,7 @@ class Judge(abc.ABC):
         Validates that the input is not too long.
         """
         encoded = tokenizer(
-            inputs, return_tensors="pt", padding=True, truncation=True
+            text=inputs, return_tensors="pt", padding=True, truncation=True
         )
         if encoded.input_ids.shape[1] < tokenizer.model_max_length:
             return encoded

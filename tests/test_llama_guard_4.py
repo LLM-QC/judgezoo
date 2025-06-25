@@ -1,4 +1,4 @@
-"""Tests for the Llama Guard 3 Judge implementation."""
+"""Tests for the Llama Guard 4 Judge implementation."""
 
 import gc
 import logging
@@ -11,28 +11,28 @@ import torch
 # Add the parent directory to the path to import judges
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from judges.llama_guard_3 import LlamaGuard3Judge
+from judges.llama_guard_4 import LlamaGuard4Judge
 
 
 @pytest.fixture(scope="session")
 def llama_guard_judge():
-    """Create a LlamaGuard3Judge instance for testing.
+    """Create a LlamaGuard4Judge instance for testing.
 
     This fixture loads the real model and is session-scoped to avoid
     reloading the model for each test.
     """
     gc.collect()
     torch.cuda.empty_cache()
-    judge = LlamaGuard3Judge()
+    judge = LlamaGuard4Judge()
     return judge
 
 
-class TestLlamaGuard3Judge:
-    """Test the Llama Guard 3 Judge implementation."""
+class TestLlamaGuard4Judge:
+    """Test the Llama Guard 4 Judge implementation."""
 
     @pytest.mark.slow
     def test_init(self, llama_guard_judge):
-        """Test LlamaGuard3Judge initialization."""
+        """Test LlamaGuard4Judge initialization."""
         judge = llama_guard_judge
 
         # Verify the judge was created successfully
@@ -41,8 +41,8 @@ class TestLlamaGuard3Judge:
         assert hasattr(judge, 'tokenizer')
 
         # Verify token IDs are set correctly
-        assert judge.unsafe_token_id == 39257
-        assert judge.safe_token_id == 19193
+        assert judge.unsafe_token_id == 72110
+        assert judge.safe_token_id == 60411
         assert judge.tokenizer.pad_token_id == 0
 
     @pytest.mark.slow
@@ -122,7 +122,6 @@ class TestLlamaGuard3Judge:
         assert all(isinstance(p, float) for p in result["p_harmful"])
         assert all(0.0 <= p <= .1 for p in result["p_harmful"])
 
-
     @pytest.mark.slow
     def test_judge_multiple_chats_harmful(self, llama_guard_judge, harmful_conversations, harmless_conversations):
         """Test judge with multiple different chats."""
@@ -164,7 +163,7 @@ class TestLlamaGuard3Judge:
         assert model_device.type in ['cuda', 'cpu']
 
     def test_inheritance(self, llama_guard_judge):
-        """Test that LlamaGuard3Judge properly inherits from FineTunedJudge."""
+        """Test that LlamaGuard4Judge properly inherits from FineTunedJudge."""
         from judges.base import FineTunedJudge
 
         judge = llama_guard_judge
@@ -210,6 +209,50 @@ class TestLlamaGuard3Judge:
         assert len(result["p_harmful"]) == 1
         assert isinstance(result["p_harmful"][0], float)
 
+    @pytest.mark.slow
+    def test_multimodal_content_handling(self, llama_guard_judge):
+        """Test that Llama Guard 4 properly handles multimodal content format."""
+        judge = llama_guard_judge
+
+        # Test with string content that should be converted to multimodal format
+        chat_string_content = [
+            [
+                {"role": "user", "content": "Hello"},
+                {"role": "assistant", "content": "Hi there!"}
+            ]
+        ]
+
+        # Test with already multimodal content format
+        chat_multimodal_content = [
+            [
+                {"role": "user", "content": [{"type": "text", "text": "Hello"}]},
+                {"role": "assistant", "content": [{"type": "text", "text": "Hi there!"}]}
+            ]
+        ]
+
+        # Both should work and produce similar results
+        result1 = judge.judge(chat_string_content)
+        result2 = judge.judge(chat_multimodal_content)
+
+        assert isinstance(result1, dict)
+        assert isinstance(result2, dict)
+        assert "p_harmful" in result1
+        assert "p_harmful" in result2
+        assert len(result1["p_harmful"]) == 1
+        assert len(result2["p_harmful"]) == 1
+
+    @pytest.mark.slow
+    def test_processor_vs_tokenizer(self, llama_guard_judge):
+        """Test that the AutoProcessor is properly initialized and used."""
+        judge = llama_guard_judge
+
+        # Verify that we're using AutoProcessor (not AutoTokenizer like LlamaGuard3)
+        from transformers import AutoProcessor
+        assert isinstance(judge.tokenizer, type(AutoProcessor.from_pretrained("meta-llama/Llama-Guard-4-12B")))
+
+        # Verify processor settings
+        assert judge.tokenizer.pad_token_id == 0
+
     def test_warning_logging(self, llama_guard_judge, caplog):
         """Test that warnings are logged when probabilities are inconsistent."""
         # This is harder to test with real models since they typically produce
@@ -218,3 +261,25 @@ class TestLlamaGuard3Judge:
             # Just verify that we can log at the warning level
             logging.warning("Test warning")
             assert "Test warning" in caplog.text
+
+    @pytest.mark.slow
+    def test_generation_parameters(self, llama_guard_judge):
+        """Test that generation uses correct parameters for Llama Guard 4."""
+        judge = llama_guard_judge
+
+        chat = [
+            [
+                {"role": "user", "content": "Hello"},
+                {"role": "assistant", "content": "Hi there!"}
+            ]
+        ]
+
+        # This test mainly ensures the generation parameters work correctly
+        # Llama Guard 4 uses max_new_tokens=12 vs Llama Guard 3's max_new_tokens=1
+        result = judge.judge(chat)
+
+        assert isinstance(result, dict)
+        assert "p_harmful" in result
+        assert len(result["p_harmful"]) == 1
+        assert isinstance(result["p_harmful"][0], float)
+        assert 0.0 <= result["p_harmful"][0] <= 1.0

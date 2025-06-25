@@ -1,9 +1,12 @@
 """Tests for the Strong Reject Judge implementation."""
 
-import pytest
-import sys
-import os
+import gc
 import logging
+import os
+import sys
+
+import pytest
+import torch
 
 # Add the parent directory to the path to import judges
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -18,11 +21,10 @@ def strong_reject_judge():
     This fixture loads the real model and is session-scoped to avoid
     reloading the model for each test.
     """
-    try:
-        judge = StrongRejectJudge()
-        return judge
-    except Exception as e:
-        pytest.skip(f"Could not load StrongRejectJudge: {e}")
+    gc.collect()
+    torch.cuda.empty_cache()
+    judge = StrongRejectJudge()
+    return judge
 
 
 class TestStrongRejectJudge:

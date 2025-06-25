@@ -3,6 +3,8 @@
 import pytest
 import sys
 import os
+import gc
+import torch
 import logging
 
 # Add the parent directory to the path to import judges
@@ -18,12 +20,10 @@ def adaptive_attacks_judge():
     This fixture loads the real model and is session-scoped to avoid
     reloading the model for each test.
     """
-    try:
-        judge = AdaptiveAttacksJudge()
-        return judge
-    except Exception as e:
-        pytest.skip(f"Could not load AdaptiveAttacksJudge: {e}")
-
+    gc.collect()
+    torch.cuda.empty_cache()
+    judge = AdaptiveAttacksJudge()
+    return judge
 
 class TestAdaptiveAttacksJudge:
     """Test the Adaptive Attacks Judge implementation."""
