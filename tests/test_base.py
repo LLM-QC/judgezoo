@@ -100,7 +100,7 @@ class TestJudge:
         result = Judge.tokenize_sequences(mock_tokenizer, inputs)
 
         mock_tokenizer.assert_called_once_with(
-            inputs, return_tensors="pt", padding=True, truncation=True
+            text=inputs, return_tensors="pt", padding=True, truncation=True
         )
         assert result is mock_encoded
 
