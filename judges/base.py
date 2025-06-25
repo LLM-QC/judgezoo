@@ -117,20 +117,27 @@ class PromptBasedJudge(Judge):
     """
     Abstract Base Class for general judges which.
     """
-    def __init__(self):
+    def __init__(
+        self,
+        use_local_model: bool | None = None,
+        local_foundation_model: str | None = None,
+        remote_foundation_model: str | None = None,
+    ):
         from .config import REMOTE_FOUNDATION_MODEL, LOCAL_FOUNDATION_MODEL, USE_LOCAL_MODEL
-        self.use_local_model = USE_LOCAL_MODEL
+        self.use_local_model = use_local_model if use_local_model is not None else USE_LOCAL_MODEL
+        local_foundation_model = local_foundation_model if local_foundation_model is not None else LOCAL_FOUNDATION_MODEL
+        remote_foundation_model = remote_foundation_model if remote_foundation_model is not None else REMOTE_FOUNDATION_MODEL
 
         if self.use_local_model:
             self.api_client = None
             self.api_model = None
             self.classifier = AutoModelForCausalLM.from_pretrained(
-                LOCAL_FOUNDATION_MODEL,
+                local_foundation_model,
                 torch_dtype=torch.bfloat16,
                 device_map="auto",
             )
             self.tokenizer = AutoTokenizer.from_pretrained(
-                LOCAL_FOUNDATION_MODEL,
+                local_foundation_model,
                 use_fast=False,
                 truncation_side="right",
                 padding_side="left"
@@ -138,12 +145,12 @@ class PromptBasedJudge(Judge):
             if self.tokenizer.pad_token_id is None:
                 self.tokenizer.pad_token_id = 0
         else:
-            if "gpt" in REMOTE_FOUNDATION_MODEL:
+            if "gpt" in remote_foundation_model:
                 self.api_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-                self.api_model = REMOTE_FOUNDATION_MODEL
+                self.api_model = remote_foundation_model
                 self.classifier = None
             else:
-                raise ValueError(f"Unknown remote foundation model {REMOTE_FOUNDATION_MODEL}")
+                raise ValueError(f"Unknown remote foundation model {remote_foundation_model}")
 
     def batch_inference(self, inputs: list[str]) -> list[str]:
         """
