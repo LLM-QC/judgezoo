@@ -74,4 +74,4 @@ If you prefer a different setup, you can pass only single-turn conversations.
 ## Tests
 To run all tests, run
 
-```pytest tests/ --runslow
+```pytest tests/ --runslow```
