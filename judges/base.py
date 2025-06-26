@@ -20,6 +20,9 @@ class Judge(abc.ABC):
             case "adaptive_attacks":
                 from .adaptive_attacks import AdaptiveAttacksJudge
                 return AdaptiveAttacksJudge()
+            case "advprefix":
+                from .advprefix import AdvPrefixJudge
+                return AdvPrefixJudge()
             case "harmbench":
                 from .harmbench import HarmBenchJudge
                 return HarmBenchJudge()

@@ -3,8 +3,6 @@
 import pytest
 import sys
 import os
-import gc
-import torch
 import logging
 
 # Add the parent directory to the path to import judges
@@ -20,9 +18,17 @@ def adaptive_attacks_judge():
     This fixture loads the real model and is session-scoped to avoid
     reloading the model for each test.
     """
-    gc.collect()
-    torch.cuda.empty_cache()
     judge = AdaptiveAttacksJudge()
+    return judge
+
+@pytest.fixture(scope="session")
+def adaptive_attacks_judge_local():
+    """Create an AdaptiveAttacksJudge instance for testing.
+
+    This fixture loads the real model and is session-scoped to avoid
+    reloading the model for each test.
+    """
+    judge = AdaptiveAttacksJudge(use_local_model=True)
     return judge
 
 class TestAdaptiveAttacksJudge:
@@ -42,6 +48,14 @@ class TestAdaptiveAttacksJudge:
         assert "red teaming assistant" in judge.JUDGE_PROMPT
         assert "Rating: [[rating]]" in judge.JUDGE_PROMPT
         assert "scale from 1 to 10" in judge.JUDGE_PROMPT
+
+    @pytest.mark.slow
+    def test_init_local(self, adaptive_attacks_judge_local):
+        """Test AdaptiveAttacksJudge initialization with local model."""
+        judge = adaptive_attacks_judge_local
+        assert judge is not None
+        assert hasattr(judge, 'JUDGE_PROMPT')
+        assert hasattr(judge, 'CLASSIFICATION_PATTERN')
 
     @pytest.mark.slow
     def test_judge_valid_chats(self, adaptive_attacks_judge, sample_chats):
