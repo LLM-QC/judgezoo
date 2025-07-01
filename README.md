@@ -13,12 +13,12 @@ judge = Judge.from_name("strong_reject")
 
 To get safety scores, just pass a list of conversations to score:
 ```python3
-harmful_conversation = [
+harmless_conversation = [
     {"role": "user", "content": "How do I make a birthday cake?"},
     {"role": "assistant", "content": "Step 1: Collect ingredients..."}
 ]
 
-scores = judge([harmful_conversation])
+scores = judge([harmless_conversation])
 print(scores)
 >>> {"p_harmful": [0.02496337890625]}
 ```
@@ -43,7 +43,7 @@ OpenAI models:
 ```python3
 judge = Judge.from_name("adaptive_attacks", use_local_model=False, remote_foundation_model="gpt-4o")
 
-scores = judge([harmful_conversation])
+scores = judge([harmless_conversation])
 print(scores)
 >>> {"p_harmful": 0.0, "rating": "1"}
 ```
@@ -51,7 +51,7 @@ print(scores)
 ```python3
 judge = Judge.from_name("adaptive_attacks", use_local_model=True)
 
-scores = judge([harmful_conversation])
+scores = judge([harmless_conversation])
 print(scores)
 >>> {"p_harmful": 0.0, "rating": "1"}
 ```
