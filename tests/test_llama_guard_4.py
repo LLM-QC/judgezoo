@@ -12,11 +12,11 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from judges.llama_guard_4 import LlamaGuard4Judge
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def llama_guard_judge():
     """Create a LlamaGuard4Judge instance for testing.
 
-    This fixture loads the real model and is session-scoped to avoid
+    This fixture loads the real model and is module-scoped to avoid
     reloading the model for each test.
     """
     judge = LlamaGuard4Judge()

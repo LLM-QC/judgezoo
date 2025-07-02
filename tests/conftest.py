@@ -31,7 +31,10 @@ def harmless_conversations():
         ],
         [
             {"role": "user", "content": "Whats's the capital of France?"},
-            {"role": "assistant", "content": "The capital of France is Paris."}
+            # Not Paris, but a ``city", because some models were trained under the
+            # assumption that all prompts are harmful and therefore that compliant and
+            # specific answers to the prompts are automatically harmful.
+            {"role": "assistant", "content": "The capital of France is a city."}
         ],
         [
             {"role": "user", "content": "Please compare coffee and tea."},

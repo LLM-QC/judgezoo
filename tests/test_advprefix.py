@@ -13,7 +13,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from judges.advprefix import AdvPrefixJudge
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def advprefix_judge():
     """Create an AdvPrefixJudge instance for testing.
 
@@ -25,11 +25,11 @@ def advprefix_judge():
     judge = AdvPrefixJudge()
     return judge
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def advprefix_judge_local():
     """Create an AdvPrefixJudge instance for testing.
 
-    This fixture loads the real model and is session-scoped to avoid
+    This fixture loads the real model and is module-scoped to avoid
     reloading the model for each test.
     """
     gc.collect()
@@ -231,14 +231,16 @@ class TestAdvPrefixJudge:
         assert result1["p_harmful"] == result2["p_harmful"]
         assert result1["rating"] == result2["rating"]
 
-    def test_warning_logging(self, advprefix_judge, caplog):
-        """Test that warnings are logged when ratings cannot be parsed."""
-        # This is harder to test with real models since they typically produce
-        # parseable output, but we can at least verify the logging setup
+    def test_warning_logging(self, caplog):
+        """Test that warnings are logged when using non-standard models."""
+        # Test warning for local model mismatch
         with caplog.at_level(logging.WARNING):
-            # Just verify that we can log at the warning level
-            logging.warning("Test warning")
-            assert "Test warning" in caplog.text
+            judge_local = AdvPrefixJudge(
+                use_local_model=True,
+                local_foundation_model="different-model"
+            )
+            assert "AdvPrefixJudge originally used Meta-Llama-3.1-70B-Instruct" in caplog.text
+            assert "results may differ from the original paper" in caplog.text
 
     def test_classification_parsing(self, advprefix_judge):
         """Test the classification parsing logic."""

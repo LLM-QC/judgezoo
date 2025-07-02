@@ -7,11 +7,16 @@
   year={2024}
 }
 """
+from enum import Enum
 import logging
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
-
 from .base import FineTunedJudge
+
+
+class HarmBenchClassifierType(Enum):
+    LLAMA_2_13B = "cais/HarmBench-Llama-2-13b-cls"
+    MISTRAL_7B = "cais/HarmBench-Mistral-7b-val-cls"
 
 
 class HarmBenchJudge(FineTunedJudge):
@@ -40,14 +45,16 @@ Answer:"""
      },
 ]
 
-    def __init__(self):
+    def __init__(self, classifier: HarmBenchClassifierType = HarmBenchClassifierType.LLAMA_2_13B):
+        assert classifier in HarmBenchClassifierType, f"Invalid classifier: {classifier}"
+
         self.classifier = AutoModelForCausalLM.from_pretrained(
-            "cais/HarmBench-Llama-2-13b-cls",
+            classifier.value,
             torch_dtype=torch.bfloat16,
             device_map="auto"
         )
         self.tokenizer = AutoTokenizer.from_pretrained(
-            "cais/HarmBench-Llama-2-13b-cls",
+            classifier.value,
             use_fast=False,
             truncation_side="right",
             padding_side="left"
@@ -56,7 +63,8 @@ Answer:"""
         self.yes_token_id = self.tokenizer.convert_tokens_to_ids("Yes")  # 8241
         self.no_token_id = self.tokenizer.convert_tokens_to_ids("No")  # 3782
 
-        chat_template = """{% if messages[0]['role'] == 'system' %}
+        if classifier == HarmBenchClassifierType.LLAMA_2_13B:
+            self.tokenizer.chat_template = """{% if messages[0]['role'] == 'system' %}
     {% set system_message = '<<SYS>>\n' + messages[0]['content'] | trim + '\n<</SYS>>\n\n' %}
     {% set messages = messages[1:] %}
 {% else %}
@@ -80,8 +88,26 @@ Answer:"""
         {{ ' ' + content | trim + ' ' + eos_token }}
     {% endif %}
 {% endfor %}"""
+        elif classifier == HarmBenchClassifierType.MISTRAL_7B:
+            self.tokenizer.chat_template = """{% if messages[0]['role'] == 'system' %}
+    {% set system_message = messages[0]['content'] | trim + '\n\n' %}
+    {% set messages = messages[1:] %}
+{% else %}
+    {% set system_message = '' %}
+{% endif %}
 
-        self.tokenizer.chat_template = chat_template
+{{ bos_token + system_message}}
+{% for message in messages %}
+    {% if (message['role'] == 'user') != (loop.index0 % 2 == 0) %}
+        {{ raise_exception('Conversation roles must alternate user/assistant/user/assistant/...') }}
+    {% endif %}
+
+    {% if message['role'] == 'user' %}
+        {{ '[INST] ' + message['content'] | trim + ' [/INST]' }}
+    {% elif message['role'] == 'assistant' %}
+        {{ ' ' + message['content'] | trim + eos_token }}
+    {% endif %}
+{% endfor %}"""
 
     def judge(
         self,

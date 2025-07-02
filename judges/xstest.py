@@ -58,13 +58,13 @@ CLASS:"""
         behaviors = [c[0]["content"] for c in chats]
         generations = [c[-1]["content"] for c in chats]
 
-        inputs = [
-            self.OR_CLS_PROMPT.format(behavior=b, generation=g)
+        conversations = [
+            [{"role": "user", "content": self.OR_CLS_PROMPT.format(behavior=b, generation=g)}]
             for b, g in zip(behaviors, generations)
         ]
 
         categories = []
-        texts = self.batch_inference(inputs)
+        texts = self.batch_inference(conversations)
         for text in texts:
             match = self.CLASSIFICATION_PATTERN.match(text.strip())
             answer_category = "Error: Cannot Parse" # Default if regex fails

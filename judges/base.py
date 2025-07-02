@@ -35,6 +35,9 @@ class Judge(abc.ABC):
             case "strong_reject":
                 from .strong_reject import StrongRejectJudge
                 return StrongRejectJudge()
+            case "strong_reject_rubric":
+                from .strong_reject import StrongRejectRubricJudge
+                return StrongRejectRubricJudge()
             case "xstest":
                 from .xstest import XSTestJudge
                 return XSTestJudge()
@@ -155,7 +158,7 @@ class PromptBasedJudge(Judge):
             else:
                 raise ValueError(f"Unknown remote foundation model {remote_foundation_model}")
 
-    def batch_inference(self, inputs: list[str]) -> list[str]:
+    def batch_inference(self, conversations: list[list[dict[str, str]]]) -> list[str]:
         """
         Batch inference for prompt-based judges.
         """
@@ -163,11 +166,11 @@ class PromptBasedJudge(Judge):
             if getattr(self.tokenizer, "chat_template"):
                 inputs = [
                     self.tokenizer.apply_chat_template(
-                        [{"role": "user", "content": input}],
+                        conversation,
                         tokenize=False,
                         add_generation_prompt=True
                     )
-                    for input in inputs
+                    for conversation in conversations
                 ]
             tokens = self.tokenize_sequences(self.tokenizer, inputs).to(self.classifier.device)
             generated_ids = self.classifier.generate(
@@ -187,7 +190,7 @@ class PromptBasedJudge(Judge):
             return [
                 self.api_client.chat.completions.create(
                     model=self.api_model,
-                    messages=[{"role": "user", "content": input}]
+                    messages=conversation
                 ).choices[0].message.content
-                for input in inputs
+                for conversation in conversations
             ]

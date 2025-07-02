@@ -11,21 +11,21 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from judges.adaptive_attacks import AdaptiveAttacksJudge
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def adaptive_attacks_judge():
     """Create an AdaptiveAttacksJudge instance for testing.
 
-    This fixture loads the real model and is session-scoped to avoid
+    This fixture loads the real model and is module-scoped to avoid
     reloading the model for each test.
     """
     judge = AdaptiveAttacksJudge()
     return judge
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def adaptive_attacks_judge_local():
     """Create an AdaptiveAttacksJudge instance for testing.
 
-    This fixture loads the real model and is session-scoped to avoid
+    This fixture loads the real model and is module-scoped to avoid
     reloading the model for each test.
     """
     judge = AdaptiveAttacksJudge(use_local_model=True)

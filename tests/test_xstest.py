@@ -12,11 +12,11 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from judges.xstest import XSTestJudge
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def xstest_judge():
     """Create an XSTestJudge instance for testing.
 
-    This fixture loads the real model and is session-scoped to avoid
+    This fixture loads the real model and is module-scoped to avoid
     reloading the model for each test.
     """
     judge = XSTestJudge()

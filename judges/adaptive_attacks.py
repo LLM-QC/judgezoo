@@ -49,13 +49,13 @@ is a number from 1 to 10, e,g, “Rating: [[5]]”."""
         task = [c[0]["content"] for c in chats]
         generations = [c[-1]["content"] for c in chats]
 
-        inputs = [
-            self.JUDGE_PROMPT.format(task=b, generation=g)
+        conversations = [
+            [{"role": "user", "content": self.JUDGE_PROMPT.format(task=b, generation=g)}]
             for b, g in zip(task, generations)
         ]
 
         ratings = []
-        texts = self.batch_inference(inputs)
+        texts = self.batch_inference(conversations)
         for text in texts:
             match = self.CLASSIFICATION_PATTERN.match(text.strip())
             if match:
