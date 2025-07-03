@@ -34,6 +34,21 @@ print(scores)
 >>> {"p_harmful": 0.0, "rating": "1"}
 ```
 
+## Supported judging schemes
+Safety
+- `adaptive_attacks` (Andriushchenko et al, 2024)
+- `adv_prefix` (Zhu et al., 2024)
+- `harmbench` (Mazeika et al. 2024) Both Llama-2-13B and Mistral-7B are supported
+- `llama_guard_3_8b` (Llama Team, 2024)
+- `llama_guard_4_12b` (Meta, 2025)
+- `strong_reject` (Souly et al., 2024) Implements the finetuned Gemma-2
+- `strong_reject_rubric` (Souly et al., 2024) Implements the rubric-based scorer
+
+Over-refusal
+- `xstest` (Röttger et al., 2023)
+
+
+## Other
 ### Prompt-based judges
 
 While some judges (such as the HarmBench classifier) are finetuned local models, others

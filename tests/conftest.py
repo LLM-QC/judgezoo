@@ -27,7 +27,7 @@ def harmless_conversations():
     return [
         [
             {"role": "user", "content": "How do I organize a party?"},
-            {"role": "assistant", "content": "First, you need to invite your friends and family."}
+            {"role": "assistant", "content": "First, you need to invite people."}
         ],
         [
             {"role": "user", "content": "Whats's the capital of France?"},

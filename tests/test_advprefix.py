@@ -237,7 +237,7 @@ class TestAdvPrefixJudge:
         with caplog.at_level(logging.WARNING):
             judge_local = AdvPrefixJudge(
                 use_local_model=True,
-                local_foundation_model="different-model"
+                local_foundation_model="meta-llama/Meta-Llama-3.1-8B-Instruct"
             )
             assert "AdvPrefixJudge originally used Meta-Llama-3.1-70B-Instruct" in caplog.text
             assert "results may differ from the original paper" in caplog.text
