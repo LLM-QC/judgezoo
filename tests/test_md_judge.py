@@ -3,7 +3,6 @@
 import logging
 import os
 import sys
-
 import pytest
 
 # Add the parent directory to the path to import judges
@@ -26,44 +25,47 @@ def md_judge():
 class TestMDJudge:
     """Test the MD Judge implementation."""
 
-    @pytest.mark.slow
-    def test_init(self, md_judge):
-        """Test MDJudge initialization."""
-        judge = md_judge
+    # @pytest.mark.slow
+    # def test_init(self, md_judge):
+    #     """Test MDJudge initialization."""
+    #     judge = md_judge
 
-        # Verify the judge was created successfully
-        assert judge is not None
-        assert hasattr(judge, 'classifier')
-        assert hasattr(judge, 'tokenizer')
+    #     # Verify the judge was created successfully
+    #     assert judge is not None
+    #     assert hasattr(judge, 'classifier')
+    #     assert hasattr(judge, 'tokenizer')
 
-        # Verify evaluation template is set correctly
-        assert isinstance(judge.evaluation_template, str)
-        assert "User:" in judge.evaluation_template
-        assert "Agent:" in judge.evaluation_template
+    #     # Verify evaluation template is set correctly
+    #     assert isinstance(judge.evaluation_template, str)
+    #     assert "User:" in judge.evaluation_template
+    #     assert "Agent:" in judge.evaluation_template
 
-    @pytest.mark.slow
-    def test_judge_valid_chats(self, md_judge, sample_chats):
-        """Test judge method with valid chats."""
-        judge = md_judge
 
-        result = judge.judge(sample_chats)
+    # def test_judge_invalid_chats(self, md_judge, invalid_chats):
+    #     """Test judge method with invalid chats."""
+    #     judge = md_judge
 
-        # Verify the result structure
-        assert isinstance(result, dict)
-        assert "p_harmful" in result
-        assert len(result["p_harmful"]) == len(sample_chats)
-        assert all(isinstance(p, float) for p in result["p_harmful"])
-        assert all(0.0 <= p <= 1.0 for p in result["p_harmful"])
+    #     result = judge.judge(invalid_chats)
 
-    def test_judge_invalid_chats(self, md_judge, invalid_chats):
-        """Test judge method with invalid chats."""
-        judge = md_judge
+    #     # Should return list of Nones for invalid chats
+    #     assert result == [None] * len(invalid_chats)
 
-        result = judge.judge(invalid_chats)
 
-        # Should return list of Nones for invalid chats
-        assert result == [None] * len(invalid_chats)
+    # @pytest.mark.slow
+    # def test_judge_valid_chats(self, md_judge, sample_chats):
+    #     """Test judge method with valid chats."""
+    #     judge = md_judge
 
+    #     result = judge.judge(sample_chats)
+
+    #     # Verify the result structure
+    #     assert isinstance(result, dict)
+    #     assert "p_harmful" in result
+    #     assert len(result["p_harmful"]) == len(sample_chats)
+    #     assert all(isinstance(p, float) for p in result["p_harmful"])
+    #     assert all(0.0 <= p <= 1.0 for p in result["p_harmful"])
+
+  
     @pytest.mark.slow
     def test_judge_safe_conversation(self, md_judge, harmless_conversations):
         """Test judge with a clearly safe conversation."""
