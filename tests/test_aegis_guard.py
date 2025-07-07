@@ -1,4 +1,4 @@
-"""Tests for the MD Judge implementation."""
+"""Tests for the Aegis Guard implementation."""
 
 import logging
 import os
@@ -13,7 +13,7 @@ from judges.aegis_guard import AegisGuardJudge
 
 @pytest.fixture(scope="session")
 def aegis_guard():
-    """Create an MDJudge instance for testing.
+    """Create an Aegis Guard instance for testing.
 
     This fixture loads the real model and is session-scoped to avoid
     reloading the model for each test.
@@ -22,12 +22,12 @@ def aegis_guard():
     return judge
 
 
-class TestMDJudge:
-    """Test the MD Judge implementation."""
+class TestAegisGuardJudge:
+    """Test the Aegis Guard implementation."""
 
     @pytest.mark.slow
     def test_init(self, aegis_guard):
-        """Test MDJudge initialization."""
+        """Test Aegis Guard initialization."""
         judge = aegis_guard
 
         # Verify the judge was created successfully
@@ -162,7 +162,7 @@ class TestMDJudge:
         assert model_device.type in ['cuda', 'cpu']
 
     def test_inheritance(self, aegis_guard):
-        """Test that MDJudge properly inherits from FineTunedJudge."""
+        """Test that Aegis guard properly inherits from FineTunedJudge."""
         from judges.base import FineTunedJudge
 
         judge = aegis_guard
