@@ -38,6 +38,12 @@ class Judge(abc.ABC):
             case "xstest":
                 from .xstest import XSTestJudge
                 return XSTestJudge()
+            case "md_judge":
+                from .md_judge import MDJudge
+                return MDJudge()
+            case "aegis_guard":
+                from .aegis_guard import AegisGuardJudge
+                return AegisGuardJudge()
             case _:
                 raise ValueError(f"Unknown judge {name}")
 

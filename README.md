@@ -65,6 +65,21 @@ single-turn interactions. In these cases, we assume the first user message to be
 prompt and the final assistant message to be the response to be judged.
 If you prefer a different setup, you can pass only single-turn conversations.
 
+### Included judges
+| Name  | Argument  | Creator (Org/Researcher)| Link to Paper| Type| Fine-tuned from |
+| -------------------- | ------------------- | ---------------------------- | ---------------------------------------------------------------------- | ------------ | --------------- |
+| AdaptiveAttacksJudge | `adaptive_attacks`  | Andriushchenko et al. (2024) | [arXiv:2404.02151](https://arxiv.org/abs/2404.02151)| prompt-based | —|
+| AdvPrefixJudge  | `advprefix`| Zhu et al. (2024)  | [arXiv:2412.10321](https://arxiv.org/abs/2412.10321)| prompt-based | —|
+| AegisGuard* | `aegis_guard`  | Ghosh et al. (2024)| [arXiv:2404.05993](https://arxiv.org/abs/2404.05993)| fine-tuned| LlamaGuard 7B|
+| MD-Judge v0.1| `md_judge`| Li, Lijun et al. (2024) | [arXiv:2402.05044](https://arxiv.org/abs/2402.05044)| fine-tuned| Mistral-7B |
+| HarmBenchJudge  | `harmbench`| Mazeika et al. (2024)| [arXiv:2402.04249](https://arxiv.org/abs/2402.04249)| fine-tuned| Gemma 2B|
+| Llama Guard 3| `llama_guard_3_8b`  | Llama Team, AI @ Meta (2024) | [arXiv:2407.21783](https://arxiv.org/abs/2407.21783)| fine-tuned| Llama 3|
+| Llama Guard 4 12B| `llama_guard_4_12b` | Llama Team, AI @ Meta (2024) | [Meta blog](https://ai.meta.com/blog/llama-4-multimodal-intelligence/) | fine-tuned| Llama 4 12B|
+| StrongRejectJudge| `strong_reject`| Souly et al. (2024)| [arXiv:2402.10260](https://arxiv.org/abs/2402.10260)| fine-tuned| Qwen 7B|
+| XSTestJudge| `xstest`  | Röttge et al. (2023)| [arXiv:2308.01263](https://arxiv.org/abs/2308.01263)| prompt-based | —|
+
+\* there are two versions of this judge (permissive and defensive). You can switch between them using Judge.from_name("aegis_guard", defensive=[True/False])
+
 
 
 
