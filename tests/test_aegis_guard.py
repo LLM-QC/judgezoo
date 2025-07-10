@@ -18,7 +18,7 @@ def aegis_guard(request):
     This fixture loads the real model and is session-scoped to avoid
     reloading the model for each test.
     """
-    defensive=request.param
+    defensive = request.param
     judge = AegisGuardJudge(defensive=defensive)
     return judge
 
@@ -33,15 +33,13 @@ class TestAegisGuardJudge:
 
         # Verify the judge was created successfully
         assert judge is not None
-        assert hasattr(judge, 'classifier')
-        assert hasattr(judge, 'tokenizer')
+        assert hasattr(judge, "classifier")
+        assert hasattr(judge, "tokenizer")
 
         # Verify evaluation template is set correctly
         assert "Task: " in judge.JUDGE_PROMPT
         assert "violence" in judge.JUDGE_PROMPT
-        assert "\'safe\'" in judge.JUDGE_PROMPT
-
-
+        assert "'safe'" in judge.JUDGE_PROMPT
 
     def test_judge_invalid_chats(self, aegis_guard, invalid_chats):
         """Test judge method with invalid chats."""
@@ -51,7 +49,6 @@ class TestAegisGuardJudge:
 
         # Should return list of Nones for invalid chats
         assert result == [None] * len(invalid_chats)
-
 
     @pytest.mark.slow
     def test_judge_valid_chats(self, aegis_guard, sample_chats):
@@ -67,7 +64,6 @@ class TestAegisGuardJudge:
         assert all(isinstance(p, float) for p in result["p_harmful"])
         assert all(0.0 <= p <= 1.0 for p in result["p_harmful"])
 
-  
     @pytest.mark.slow
     def test_judge_safe_conversation(self, aegis_guard, harmless_conversations):
         """Test judge with a clearly safe conversation."""
@@ -83,7 +79,9 @@ class TestAegisGuardJudge:
         # We don't assert a specific threshold since model outputs can vary
 
     @pytest.mark.slow
-    def test_judge_potentially_harmful_conversation(self, aegis_guard, harmful_conversations):
+    def test_judge_potentially_harmful_conversation(
+        self, aegis_guard, harmful_conversations
+    ):
         """Test judge with a potentially harmful conversation."""
         judge = aegis_guard
 
@@ -107,10 +105,12 @@ class TestAegisGuardJudge:
         assert "p_harmful" in result
         assert len(result["p_harmful"]) == len(harmless_conversations)
         assert all(isinstance(p, float) for p in result["p_harmful"])
-        assert all(0.0 <= p <= .1 for p in result["p_harmful"])
+        assert all(0.0 <= p <= 0.1 for p in result["p_harmful"])
 
     @pytest.mark.slow
-    def test_judge_multiple_chats_harmless_batched(self, aegis_guard, harmless_conversations):
+    def test_judge_multiple_chats_harmless_batched(
+        self, aegis_guard, harmless_conversations
+    ):
         """Test judge with multiple different chats."""
         judge = aegis_guard
 
@@ -120,10 +120,12 @@ class TestAegisGuardJudge:
         assert "p_harmful" in result
         assert len(result["p_harmful"]) == len(harmless_conversations)
         assert all(isinstance(p, float) for p in result["p_harmful"])
-        assert all(0.0 <= p <= .1 for p in result["p_harmful"])
+        assert all(0.0 <= p <= 0.1 for p in result["p_harmful"])
 
     @pytest.mark.slow
-    def test_judge_multiple_chats_harmful(self, aegis_guard, harmful_conversations, harmless_conversations):
+    def test_judge_multiple_chats_harmful(
+        self, aegis_guard, harmful_conversations, harmless_conversations
+    ):
         """Test judge with multiple different chats."""
         judge = aegis_guard
 
@@ -132,15 +134,17 @@ class TestAegisGuardJudge:
 
         assert isinstance(result, dict)
         assert "p_harmful" in result
-        assert len(result["p_harmful"]) == len(harmful_conversations) + len(harmless_conversations)
+        assert len(result["p_harmful"]) == len(harmful_conversations) + len(
+            harmless_conversations
+        )
         assert all(isinstance(p, float) for p in result["p_harmful"])
 
         # Check harmful conversations (first part of results)
-        harmful_probs = result["p_harmful"][:len(harmful_conversations)]
+        harmful_probs = result["p_harmful"][: len(harmful_conversations)]
         assert all(0.5 <= p <= 1.0 for p in harmful_probs)
 
         # Check harmless conversations (second part of results)
-        harmless_probs = result["p_harmful"][len(harmful_conversations):]
+        harmless_probs = result["p_harmful"][len(harmful_conversations) :]
         assert all(0.0 <= p <= 0.1 for p in harmless_probs)
 
     def test_judge_empty_chats(self, aegis_guard):
@@ -160,7 +164,7 @@ class TestAegisGuardJudge:
 
         # Check that the model is on some device
         model_device = next(judge.classifier.parameters()).device
-        assert model_device.type in ['cuda', 'cpu']
+        assert model_device.type in ["cuda", "cpu"]
 
     def test_inheritance(self, aegis_guard):
         """Test that Aegis guard properly inherits from FineTunedJudge."""
@@ -177,7 +181,10 @@ class TestAegisGuardJudge:
         chat = [
             [
                 {"role": "user", "content": "Tell me a joke."},
-                {"role": "assistant", "content": "Why don't scientists trust atoms? Because they make up everything!"}
+                {
+                    "role": "assistant",
+                    "content": "Why don't scientists trust atoms? Because they make up everything!",
+                },
             ]
         ]
 
@@ -196,7 +203,7 @@ class TestAegisGuardJudge:
         chat = [
             [
                 {"role": "user", "content": "Hello"},
-                {"role": "assistant", "content": "Hi there!"}
+                {"role": "assistant", "content": "Hi there!"},
             ]
         ]
 
