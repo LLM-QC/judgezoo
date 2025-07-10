@@ -11,7 +11,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from judges.aegis_guard import AegisGuardJudge
 
 
-@pytest.fixture(scope="session", params=[False, True], ids=["permissive", "defensive"])
+@pytest.fixture(scope="module", params=[False, True], ids=["permissive", "defensive"])
 def aegis_guard(request):
     """Create an Aegis Guard instance for testing.
 
