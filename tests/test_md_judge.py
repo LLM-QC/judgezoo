@@ -11,7 +11,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from judges.md_judge import MDJudge
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def md_judge():
     """Create an MDJudge instance for testing.
 
