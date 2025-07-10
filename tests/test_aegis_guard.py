@@ -11,14 +11,15 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from judges.aegis_guard import AegisGuardJudge
 
 
-@pytest.fixture(scope="session")
-def aegis_guard():
+@pytest.fixture(scope="session", params=[False, True], ids=["permissive", "defensive"])
+def aegis_guard(request):
     """Create an Aegis Guard instance for testing.
 
     This fixture loads the real model and is session-scoped to avoid
     reloading the model for each test.
     """
-    judge = AegisGuardJudge()
+    defensive=request.param
+    judge = AegisGuardJudge(defensive=defensive)
     return judge
 
 
@@ -36,9 +37,9 @@ class TestAegisGuardJudge:
         assert hasattr(judge, 'tokenizer')
 
         # Verify evaluation template is set correctly
-        assert "Task: " in judge.prompt_start
-        assert "violence" in judge.unsafe_categories
-        assert "\'safe\'" in judge.prompt_end
+        assert "Task: " in judge.JUDGE_PROMPT
+        assert "violence" in judge.JUDGE_PROMPT
+        assert "\'safe\'" in judge.JUDGE_PROMPT
 
 
 

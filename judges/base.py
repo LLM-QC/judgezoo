@@ -15,7 +15,7 @@ class Judge(abc.ABC):
     Subclasses must implement the `judge` method.
     """
     @classmethod
-    def from_name(cls, name: str) -> "Judge":
+    def from_name(cls, name: str, defensive: bool = False) -> "Judge":
         match name:
             case "adaptive_attacks":
                 from .adaptive_attacks import AdaptiveAttacksJudge
@@ -23,6 +23,9 @@ class Judge(abc.ABC):
             case "advprefix":
                 from .advprefix import AdvPrefixJudge
                 return AdvPrefixJudge()
+            case "aegis_guard":
+                from .aegis_guard import AegisGuardJudge
+                return AegisGuardJudge(defensive=defensive)
             case "harmbench":
                 from .harmbench import HarmBenchJudge
                 return HarmBenchJudge()
@@ -32,18 +35,15 @@ class Judge(abc.ABC):
             case "llama_guard_4_12b":
                 from .llama_guard_4 import LlamaGuard4Judge
                 return LlamaGuard4Judge()
+            case "md_judge":
+                from .md_judge import MDJudge
+                return MDJudge()
             case "strong_reject":
                 from .strong_reject import StrongRejectJudge
                 return StrongRejectJudge()
             case "xstest":
                 from .xstest import XSTestJudge
                 return XSTestJudge()
-            case "md_judge":
-                from .md_judge import MDJudge
-                return MDJudge()
-            case "aegis_guard":
-                from .aegis_guard import AegisGuardJudge
-                return AegisGuardJudge()
             case _:
                 raise ValueError(f"Unknown judge {name}")
 

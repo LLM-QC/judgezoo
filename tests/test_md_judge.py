@@ -36,9 +36,9 @@ class TestMDJudge:
         assert hasattr(judge, 'tokenizer')
 
         # Verify evaluation template is set correctly
-        assert isinstance(judge.evaluation_template, str)
-        assert "User:" in judge.evaluation_template
-        assert "Agent:" in judge.evaluation_template
+        assert isinstance(judge.JUDGE_PROMPT, str)
+        assert "User:" in judge.JUDGE_PROMPT
+        assert "Agent:" in judge.JUDGE_PROMPT
 
 
     def test_judge_invalid_chats(self, md_judge, invalid_chats):
