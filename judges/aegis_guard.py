@@ -219,7 +219,7 @@ Provide your safety assessment for Assistant in the above conversation:
 
         if (u_probs + s_probs - 1.0).abs().max() > 1e-2:
             logging.warning(
-                f"MD-Judge probs don't sum to 1: unsafe={u_probs}, safe={s_probs}"
+                f"Aegis Guard probs don't sum to 1: unsafe={u_probs}, safe={s_probs}"
             )
 
         p_harmful = u_probs.cpu().tolist()
