@@ -224,8 +224,12 @@ Provide your safety assessment for Agent's response to the User's instruction in
         questions = [chat[0]["content"] for chat in chats]
         answers = [chat[1]["content"] for chat in chats]
 
+        cls_prompt = self.tokenizer.apply_chat_template(
+            self.CLS_CONVERSATION, tokenize=False
+        )
+
         inputs = [
-            self.tokenizer.apply_chat_template(self.CLS_CONVERSATION, tokenize=False).format(question=question, answer=answer)
+            cls_prompt.format(question=question, answer=answer)
             for question, answer in zip(questions, answers)
         ]
 

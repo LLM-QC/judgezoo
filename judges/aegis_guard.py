@@ -200,20 +200,8 @@ Provide your safety assessment for Assistant in the above conversation:
     {% endif %}
 {% endfor %}""")
 
-        self.safe_token_ids = [
-            11177,
-            17618,
-            29903,
-            29879,
-            9109,
-        ]  # 'safe', 'Sa', 'S', 's', 'safe'
-        self.unsafe_token_ids = [
-            25807,
-            348,
-            2525,
-            25110,
-            6948,
-        ]  # 'Uns', 'un', 'Un', 'unsafe', 'uns'
+        self.safe_token_ids = [11177, 17618, 29903, 29879, 9109]  # 'safe', 'Sa', 'S', 's', 'safe'  # fmt: off
+        self.unsafe_token_ids = [25807, 348, 2525, 25110, 6948]  # 'Uns', 'un', 'Un', 'unsafe', 'uns'  # fmt: off
 
     def judge(
         self, chats: list[list[dict[str, str]]]
