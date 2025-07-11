@@ -3,6 +3,7 @@
 import logging
 import os
 import sys
+
 import pytest
 
 # Add the parent directory to the path to import judges
@@ -37,9 +38,9 @@ class TestAegisGuardJudge:
         assert hasattr(judge, "tokenizer")
 
         # Verify evaluation template is set correctly
-        assert "Task: " in judge.JUDGE_PROMPT
-        assert "violence" in judge.JUDGE_PROMPT
-        assert "'safe'" in judge.JUDGE_PROMPT
+        assert "Task: " in judge.CLS_CONVERSATION[0]["content"]
+        assert "violence" in judge.CLS_CONVERSATION[0]["content"]
+        assert "'safe'" in judge.CLS_CONVERSATION[0]["content"]
 
     def test_judge_invalid_chats(self, aegis_guard, invalid_chats):
         """Test judge method with invalid chats."""

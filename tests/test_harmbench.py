@@ -9,7 +9,7 @@ import pytest
 # Add the parent directory to the path to import judges
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from judges.harmbench import HarmBenchJudge, HarmBenchClassifierType
+from judges.harmbench import HarmBenchClassifier, HarmBenchJudge
 
 
 @pytest.fixture(scope="module")
@@ -30,7 +30,7 @@ def harmbench_judge_mistral():
     This fixture loads the Mistral model and is module-scoped to avoid
     reloading the model for each test.
     """
-    judge = HarmBenchJudge(classifier=HarmBenchClassifierType.MISTRAL_7B)
+    judge = HarmBenchJudge(classifier=HarmBenchClassifier.MISTRAL_7B)
     return judge
 
 
@@ -68,7 +68,7 @@ class TestHarmbenchJudge:
     @pytest.mark.slow
     def test_init_with_explicit_llama_model(self):
         """Test HarmBenchJudge initialization with explicit Llama model."""
-        judge = HarmBenchJudge(classifier=HarmBenchClassifierType.LLAMA_2_13B)
+        judge = HarmBenchJudge(classifier=HarmBenchClassifier.LLAMA_2_13B)
 
         # Verify the judge was created successfully
         assert judge is not None
@@ -519,8 +519,8 @@ class TestHarmbenchJudgeModelSpecific:
     @pytest.mark.slow
     def test_token_ids_consistency_across_models(self):
         """Test that token IDs are consistent across different models."""
-        llama_judge = HarmBenchJudge(classifier=HarmBenchClassifierType.LLAMA_2_13B)
-        mistral_judge = HarmBenchJudge(classifier=HarmBenchClassifierType.MISTRAL_7B)
+        llama_judge = HarmBenchJudge(classifier=HarmBenchClassifier.LLAMA_2_13B)
+        mistral_judge = HarmBenchJudge(classifier=HarmBenchClassifier.MISTRAL_7B)
 
         # Verify the specific expected values
         assert llama_judge.yes_token_id == 8241
@@ -531,8 +531,8 @@ class TestHarmbenchJudgeModelSpecific:
     @pytest.mark.slow
     def test_model_specific_chat_templates(self):
         """Test that each model gets its appropriate chat template."""
-        llama_judge = HarmBenchJudge(classifier=HarmBenchClassifierType.LLAMA_2_13B)
-        mistral_judge = HarmBenchJudge(classifier=HarmBenchClassifierType.MISTRAL_7B)
+        llama_judge = HarmBenchJudge(classifier=HarmBenchClassifier.LLAMA_2_13B)
+        mistral_judge = HarmBenchJudge(classifier=HarmBenchClassifier.MISTRAL_7B)
 
         # Verify Llama template characteristics
         llama_template = llama_judge.tokenizer.chat_template
@@ -552,17 +552,17 @@ class TestHarmbenchJudgeModelSpecific:
     @pytest.mark.slow
     def test_enum_values_match_model_paths(self):
         """Test that enum values match expected HuggingFace model paths."""
-        assert HarmBenchClassifierType.LLAMA_2_13B.value == "cais/HarmBench-Llama-2-13b-cls"
-        assert HarmBenchClassifierType.MISTRAL_7B.value == "cais/HarmBench-Mistral-7b-val-cls"
+        assert HarmBenchClassifier.LLAMA_2_13B.value == "cais/HarmBench-Llama-2-13b-cls"
+        assert HarmBenchClassifier.MISTRAL_7B.value == "cais/HarmBench-Mistral-7b-val-cls"
 
     def test_all_enum_models_supported(self):
         """Test that all models in the enum can be instantiated."""
         # This test doesn't load the actual models (not marked as slow)
         # but verifies the enum structure is correct
-        models = list(HarmBenchClassifierType)
+        models = list(HarmBenchClassifier)
         assert len(models) == 2
-        assert HarmBenchClassifierType.LLAMA_2_13B in models
-        assert HarmBenchClassifierType.MISTRAL_7B in models
+        assert HarmBenchClassifier.LLAMA_2_13B in models
+        assert HarmBenchClassifier.MISTRAL_7B in models
 
     @pytest.mark.slow
     def test_mistral_specific_edge_cases(self, harmbench_judge_mistral):
@@ -599,8 +599,8 @@ class TestHarmbenchJudgeModelSpecific:
             ]
         ]
 
-        llama_judge = HarmBenchJudge(classifier=HarmBenchClassifierType.LLAMA_2_13B)
-        mistral_judge = HarmBenchJudge(classifier=HarmBenchClassifierType.MISTRAL_7B)
+        llama_judge = HarmBenchJudge(classifier=HarmBenchClassifier.LLAMA_2_13B)
+        mistral_judge = HarmBenchJudge(classifier=HarmBenchClassifier.MISTRAL_7B)
 
         # Both should handle the longer conversation
         llama_result = llama_judge.judge(long_chat)

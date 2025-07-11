@@ -1,9 +1,10 @@
 """Tests for the Adaptive Attacks Judge implementation."""
 
-import pytest
-import sys
-import os
 import logging
+import os
+import sys
+
+import pytest
 
 # Add the parent directory to the path to import judges
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

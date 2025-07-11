@@ -42,7 +42,8 @@ def with_max_batchsize(
     for i, inp in enumerate(inputs[1:], 1):
         if len(inp) != input_length:
             raise ValueError(
-                f"All inputs must have the same length. Input 0 has length {input_length}, but input {i} has length {len(inp)}"
+                f"All inputs must have the same length. "
+                f"Input 0 has length {input_length}, but input {i} has length {len(inp)}."
             )
 
     outputs = []
@@ -123,3 +124,10 @@ def free_vram():
     for _ in range(3):
         gc.collect()
         torch.cuda.empty_cache()
+
+
+def parse_chat_template(template: str) -> str:
+    """
+    Parse a chat template and return a string with the template replaced.
+    """
+    return template.replace("    ", "").replace("\n", "")

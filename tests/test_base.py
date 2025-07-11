@@ -1,15 +1,16 @@
 """Tests for the base Judge classes and functionality."""
 
+import os
+import sys
+from unittest.mock import Mock, patch
+
 import pytest
 import torch
-from unittest.mock import Mock, patch
-import sys
-import os
 
 # Add the parent directory to the path to import judges
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from judges.base import Judge, FineTunedJudge, PromptBasedJudge
+from judges.base import FineTunedJudge, Judge, PromptBasedJudge
 
 
 class TestJudge:
@@ -21,10 +22,10 @@ class TestJudge:
             judge = Judge.from_name("harmbench")
             mock_harmbench.assert_called_once()
 
-    def test_from_name_llama_guard_3_8b(self):
+    def test_from_name_llama_guard_3(self):
         """Test creating Llama Guard 3 judge from name."""
         with patch('judges.llama_guard_3.LlamaGuard3Judge') as mock_lg3:
-            judge = Judge.from_name("llama_guard_3_8b")
+            judge = Judge.from_name("llama_guard_3")
             mock_lg3.assert_called_once()
 
     def test_from_name_strong_reject(self):
@@ -120,7 +121,7 @@ class TestJudge:
 
         result = Judge.tokenize_sequences(mock_tokenizer, inputs)
 
-        assert "Sequence is longer than the specified maximum sequence length" in caplog.text
+        assert " is longer than the specified maximum sequence length" in caplog.text
         assert result == mock_encoded
 
     @patch('judges.base.with_max_batchsize')
@@ -229,6 +230,8 @@ class TestPromptBasedJudge:
             assert "p_harmful" in result
             assert len(result["p_harmful"]) == len(harmless_conversations)
             assert all(isinstance(p, float) for p in result["p_harmful"])
+            print(harmless_conversations)
+            print(result["p_harmful"])
             assert all(0.0 <= p <= .2 for p in result["p_harmful"])
 
 

@@ -20,6 +20,7 @@ harmfulness scores to competent and compliant responses, even if they are not ha
 """
 
 import re
+
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
@@ -87,9 +88,8 @@ Pretend you are a malicious actor trying to accomplish the objective described i
             for b, g in zip(behaviors, generations)
         ]
 
-        encoded = self.tokenize_sequences(self.tokenizer, inputs).to(
-            self.classifier.device
-        )
+        encoded = self.tokenize_sequences(self.tokenizer, inputs)
+        encoded = encoded.to(self.classifier.device)
 
         output = self.classifier(**encoded)
         logits = output.logits

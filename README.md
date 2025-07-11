@@ -35,18 +35,22 @@ print(scores)
 ```
 
 ## Supported judging schemes
-Safety
-- `adaptive_attacks` (Andriushchenko et al, 2024)
-- `adv_prefix` (Zhu et al., 2024)
-- `harmbench` (Mazeika et al. 2024) Both Llama-2-13B and Mistral-7B are supported
-- `llama_guard_3_8b` (Llama Team, 2024)
-- `llama_guard_4_12b` (Meta, 2025)
-- `strong_reject` (Souly et al., 2024) Implements the finetuned Gemma-2
-- `strong_reject_rubric` (Souly et al., 2024) Implements the rubric-based scorer
 
-Over-refusal
-- `xstest` (Röttger et al., 2023)
+### Included judges
+| Name                   | Argument              | Creator (Org/Researcher)     | Link to Paper                                       | Type         | Fine-tuned from        |
+| ---------------------- | --------------------- | ---------------------------- | ----------------------------------------------------| ------------ | ---------------------- |
+| Adaptive Attacks       | `adaptive_attacks`    | Andriushchenko et al. (2024) | [arXiv:2404.02151](https://arxiv.org/abs/2404.02151)| prompt-based | —                      |
+| AdvPrefix              | `advprefix`           | Zhu et al. (2024)            | [arXiv:2412.10321](https://arxiv.org/abs/2412.10321)| prompt-based | —                      |
+| AegisGuard*            | `aegis_guard`         | Ghosh et al. (2024)          | [arXiv:2404.05993](https://arxiv.org/abs/2404.05993)| fine-tuned   | LlamaGuard 7B          |
+| MD-Judge (v0.1 & v0.2) | `md_judge`            | Li, Lijun et al. (2024)      | [arXiv:2402.05044](https://arxiv.org/abs/2402.05044)| fine-tuned   | Mistral-7B/LMintern2 7B|
+| HarmBench              | `harmbench`           | Mazeika et al. (2024)        | [arXiv:2402.04249](https://arxiv.org/abs/2402.04249)| fine-tuned   | Gemma 2B               |
+| Llama Guard 3          | `llama_guard_3`       | Llama Team, AI @ Meta (2024) | [arXiv:2407.21783](https://arxiv.org/abs/2407.21783)| fine-tuned   | Llama 3 8B             |
+| Llama Guard 4          | `llama_guard_4`       | Llama Team, AI @ Meta (2024) | [Meta blog](https://ai.meta.com/blog/llama-4-multimodal-intelligence/) | fine-tuned | Llama 4 12B |
+| StrongREJECT           | `strong_reject`       | Souly et al. (2024)          | [arXiv:2402.10260](https://arxiv.org/abs/2402.10260)| fine-tuned   | Gemma 2b               |
+| StrongREJECT (rubric)  | `strong_reject_rubric`| Souly et al. (2024)          | [arXiv:2402.10260](https://arxiv.org/abs/2402.10260)| prompt-based | -                      |
+| XSTestJudge            | `xstest`              | Röttge et al. (2023)         | [arXiv:2308.01263](https://arxiv.org/abs/2308.01263)| prompt-based | —                      |
 
+\* there are two versions of this judge (permissive and defensive). You can switch between them using Judge.from_name("aegis_guard", defensive=[True/False])
 
 ## Other
 ### Prompt-based judges
@@ -80,21 +84,6 @@ single-turn interactions. In these cases, we assume the first user message to be
 prompt and the final assistant message to be the response to be judged.
 If you prefer a different setup, you can pass only single-turn conversations.
 
-### Included judges
-| Name  | Argument  | Creator (Org/Researcher)| Link to Paper| Type| Fine-tuned from |
-| -------------------- | ------------------- | ---------------------------- | ---------------------------------------------------------------------- | ------------ | --------------- |
-| Adaptive Attacks | `adaptive_attacks`  | Andriushchenko et al. (2024) | [arXiv:2404.02151](https://arxiv.org/abs/2404.02151)| prompt-based | — |
-| AdvPrefix  | `advprefix`| Zhu et al. (2024)  | [arXiv:2412.10321](https://arxiv.org/abs/2412.10321)| prompt-based | — |
-| AegisGuard* | `aegis_guard`  | Ghosh et al. (2024)| [arXiv:2404.05993](https://arxiv.org/abs/2404.05993)| fine-tuned | LlamaGuard 7B |
-| MD-Judge v0.1| `md_judge`| Li, Lijun et al. (2024) | [arXiv:2402.05044](https://arxiv.org/abs/2402.05044)| fine-tuned | Mistral-7B |
-| HarmBench  | `harmbench`| Mazeika et al. (2024)| [arXiv:2402.04249](https://arxiv.org/abs/2402.04249)| fine-tuned| Gemma 2B |
-| Llama Guard 3 | `llama_guard_3_8b`  | Llama Team, AI @ Meta (2024) | [arXiv:2407.21783](https://arxiv.org/abs/2407.21783)| fine-tuned| Llama 3 |
-| Llama Guard 4 | `llama_guard_4_12b` | Llama Team, AI @ Meta (2024) | [Meta blog](https://ai.meta.com/blog/llama-4-multimodal-intelligence/) | fine-tuned | Llama 4 12B |
-| StrongREJECT | `strong_reject`| Souly et al. (2024)| [arXiv:2402.10260](https://arxiv.org/abs/2402.10260)| fine-tuned | Gemma 2b |
-| StrongREJECT (rubric) | `strong_reject_rubric`| Souly et al. (2024)| [arXiv:2402.10260](https://arxiv.org/abs/2402.10260)| prompt-based |- |
-| XSTestJudge| `xstest`  | Röttge et al. (2023)| [arXiv:2308.01263](https://arxiv.org/abs/2308.01263)| prompt-based | — |
-
-\* there are two versions of this judge (permissive and defensive). You can switch between them using Judge.from_name("aegis_guard", defensive=[True/False])
 
 
 

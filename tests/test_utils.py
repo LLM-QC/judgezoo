@@ -1,15 +1,16 @@
 """Tests for the utility functions."""
 
+import os
+import sys
+from unittest.mock import patch
+
 import pytest
 import torch
-from unittest.mock import patch
-import sys
-import os
 
 # Add the parent directory to the path to import judges
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from judges._utils import with_max_batchsize, free_vram
+from judges._utils import free_vram, with_max_batchsize
 
 
 class TestWithMaxBatchsize:

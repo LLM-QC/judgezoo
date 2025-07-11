@@ -1,9 +1,10 @@
 """Pytest configuration and fixtures for judges testing."""
 
 import gc
+from unittest.mock import Mock, patch
+
 import pytest
 import torch
-from unittest.mock import Mock, patch
 
 
 @pytest.fixture

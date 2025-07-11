@@ -1,11 +1,12 @@
 """Tests for the AdvPrefix Judge implementation."""
 
-import pytest
-import sys
-import os
 import gc
-import torch
 import logging
+import os
+import sys
+
+import pytest
+import torch
 
 # Add the parent directory to the path to import judges
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

@@ -1,10 +1,11 @@
 import abc
 import logging
 import os
-from openai import OpenAI
 
 import torch
-from transformers import PreTrainedTokenizer, AutoModelForCausalLM, AutoTokenizer
+from openai import OpenAI
+from transformers import AutoModelForCausalLM, AutoTokenizer, PreTrainedTokenizer
+
 from ._utils import with_max_batchsize
 
 
@@ -15,38 +16,38 @@ class Judge(abc.ABC):
     Subclasses must implement the `judge` method.
     """
     @classmethod
-    def from_name(cls, name: str, defensive: bool = False) -> "Judge":
+    def from_name(cls, name: str, **kwargs) -> "Judge":
         match name:
             case "adaptive_attacks":
                 from .adaptive_attacks import AdaptiveAttacksJudge
-                return AdaptiveAttacksJudge()
+                return AdaptiveAttacksJudge(**kwargs)
             case "advprefix":
                 from .advprefix import AdvPrefixJudge
-                return AdvPrefixJudge()
+                return AdvPrefixJudge(**kwargs)
             case "aegis_guard":
                 from .aegis_guard import AegisGuardJudge
-                return AegisGuardJudge(defensive=defensive)
+                return AegisGuardJudge(**kwargs)
             case "harmbench":
                 from .harmbench import HarmBenchJudge
-                return HarmBenchJudge()
-            case "llama_guard_3_8b":
+                return HarmBenchJudge(**kwargs)
+            case "llama_guard_3":
                 from .llama_guard_3 import LlamaGuard3Judge
-                return LlamaGuard3Judge()
-            case "llama_guard_4_12b":
+                return LlamaGuard3Judge(**kwargs)
+            case "llama_guard_4":
                 from .llama_guard_4 import LlamaGuard4Judge
-                return LlamaGuard4Judge()
+                return LlamaGuard4Judge(**kwargs)
             case "md_judge":
                 from .md_judge import MDJudge
-                return MDJudge()
+                return MDJudge(**kwargs)
             case "strong_reject":
                 from .strong_reject import StrongRejectJudge
-                return StrongRejectJudge()
+                return StrongRejectJudge(**kwargs)
             case "strong_reject_rubric":
                 from .strong_reject import StrongRejectRubricJudge
-                return StrongRejectRubricJudge()
+                return StrongRejectRubricJudge(**kwargs)
             case "xstest":
                 from .xstest import XSTestJudge
-                return XSTestJudge()
+                return XSTestJudge(**kwargs)
             case _:
                 raise ValueError(f"Unknown judge {name}")
 
@@ -104,17 +105,29 @@ class Judge(abc.ABC):
         inputs: list[str],
     ) -> tuple[torch.Tensor, torch.Tensor]:
         """
-        Validates that the input is not too long.
+        Tokenizes the inputs and validates that the input is not too long.
+
+        Args:
+            tokenizer: The tokenizer to use.
+            inputs: The inputs to tokenize.
+
+        Returns:
+            A tuple of tensors containing the input IDs and attention masks.
         """
         encoded = tokenizer(
             text=inputs, return_tensors="pt", padding=True, truncation=True
         )
         if encoded.input_ids.shape[1] < tokenizer.model_max_length:
             return encoded
-        for i in range(len(inputs)):
-            if (l := len(tokenizer(inputs[i], padding=True, truncation=False).input_ids)) > tokenizer.model_max_length:
-                logging.warning(f"Sequence is longer than the specified maximum sequence length for this model ({l} > {tokenizer.model_max_length}). This sequence will be truncated, which may lead to incorrect results.")
-                return encoded
+
+        for i, input_text in enumerate(inputs):
+            token_length = len(tokenizer(input_text, padding=True, truncation=False).input_ids)
+            if token_length > tokenizer.model_max_length:
+                logging.warning(
+                    f"Sequence {i} is longer than the specified maximum sequence length "
+                    f"for this model ({token_length} > {tokenizer.model_max_length}). "
+                    f"This sequence will be truncated, which may lead to incorrect results."
+                )
         return encoded
 
 
@@ -135,7 +148,8 @@ class PromptBasedJudge(Judge):
         local_foundation_model: str | None = None,
         remote_foundation_model: str | None = None,
     ):
-        from .config import REMOTE_FOUNDATION_MODEL, LOCAL_FOUNDATION_MODEL, USE_LOCAL_MODEL
+        from .config import (LOCAL_FOUNDATION_MODEL, REMOTE_FOUNDATION_MODEL,
+                             USE_LOCAL_MODEL)
         self.use_local_model = use_local_model if use_local_model is not None else USE_LOCAL_MODEL
         local_foundation_model = local_foundation_model if local_foundation_model is not None else LOCAL_FOUNDATION_MODEL
         remote_foundation_model = remote_foundation_model if remote_foundation_model is not None else REMOTE_FOUNDATION_MODEL

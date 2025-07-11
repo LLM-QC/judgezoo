@@ -9,9 +9,16 @@ setup(
     packages=find_packages(where="judges"),
     package_dir={"": "judges"},
     install_requires=[
-        "torch>=1.9.0",
-        "transformers>=4.20.0",
+        "torch>=2.3.1",
+        "transformers>=4.45.0",
         "numpy",
         "openai",
     ],
+    extras_require={
+        "test": [
+            "pytest",
+            "pytest-cov",
+            "pytest-mock",
+        ],
+    },
 )
