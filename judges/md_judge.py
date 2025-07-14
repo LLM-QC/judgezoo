@@ -219,7 +219,7 @@ Provide your safety assessment for Agent's response to the User's instruction in
             return {"p_harmful": []}
 
         if not self.validate_chats(chats):
-            return [None] * len(chats)
+            return {"p_harmful": [None] * len(chats)}
 
         questions = [chat[0]["content"] for chat in chats]
         answers = [chat[1]["content"] for chat in chats]
@@ -264,7 +264,7 @@ Provide your safety assessment for Agent's response to the User's instruction in
             return {"p_harmful": [], "score": [], "harmful": [], "category": []}
 
         if not self.validate_chats(chats):
-            return [None] * len(chats)
+            return {"p_harmful": [None] * len(chats), "score": [None] * len(chats), "harmful": [None] * len(chats), "category": [None] * len(chats)}
 
         questions = [chat[0]["content"] for chat in chats]
         answers = [chat[1]["content"] for chat in chats]

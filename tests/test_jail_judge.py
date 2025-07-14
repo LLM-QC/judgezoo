@@ -10,7 +10,7 @@ import pytest
 # Add the parent directory to the path to import judges
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from judges.jailjudge import JailJudge
+from judges.jail_judge import JailJudge
 
 
 @pytest.fixture(scope="module")
@@ -58,10 +58,10 @@ class TestJailJudge:
         # Verify the result structure
         assert isinstance(result, dict)
         assert "p_harmful" in result
-        assert "raw_scores" in result
+        assert "rating" in result
         assert "reason" in result
         assert len(result["p_harmful"]) == len(sample_chats)
-        assert len(result["raw_scores"]) == len(sample_chats)
+        assert len(result["rating"]) == len(sample_chats)
         assert len(result["reason"]) == len(sample_chats)
 
         # Verify data types and ranges
@@ -70,7 +70,7 @@ class TestJailJudge:
                 assert isinstance(p, float)
                 assert 0.0 <= p <= 1.0
 
-        for score in result["raw_scores"]:
+        for score in result["rating"]:
             if score is not None:
                 assert isinstance(score, int)
                 assert 1 <= score <= 10
@@ -84,10 +84,10 @@ class TestJailJudge:
         # Should return dict with None values for invalid chats
         assert isinstance(result, dict)
         assert "p_harmful" in result
-        assert "raw_scores" in result
+        assert "rating" in result
         assert len(result["p_harmful"]) == len(invalid_chats)
         assert all(p is None for p in result["p_harmful"])
-        assert all(score is None for score in result["raw_scores"])
+        assert all(score is None for score in result["rating"])
         # Note: reason field is not included for invalid chats
 
     @pytest.mark.slow
@@ -99,7 +99,7 @@ class TestJailJudge:
 
         assert isinstance(result, dict)
         assert "p_harmful" in result
-        assert "raw_scores" in result
+        assert "rating" in result
         assert "reason" in result
         assert len(result["p_harmful"]) == len(harmless_conversations)
         assert not any("Heuristic" in r for r in result["reason"])
@@ -108,7 +108,7 @@ class TestJailJudge:
         for p in result["p_harmful"]:
             assert 0.0 <= p <= 0.5  # Normalized score should be lower for safe content
 
-        for score in result["raw_scores"]:
+        for score in result["rating"]:
             assert 1 <= score <= 5  # Raw score should be lower for safe content
 
     @pytest.mark.slow
@@ -120,7 +120,7 @@ class TestJailJudge:
 
         assert isinstance(result, dict)
         assert "p_harmful" in result
-        assert "raw_scores" in result
+        assert "rating" in result
         assert "reason" in result
         assert len(result["p_harmful"]) == len(harmful_conversations)
         assert not any("Heuristic" in r for r in result["reason"])
@@ -129,7 +129,7 @@ class TestJailJudge:
         for p in result["p_harmful"]:
             assert 0.5 <= p <= 1.0  # Normalized score should be higher for harmful content
 
-        for score in result["raw_scores"]:
+        for score in result["rating"]:
             assert 5 <= score <= 10  # Raw score should be higher for harmful content
 
     def test_judge_empty_chats(self, jailjudge_instance):
@@ -140,10 +140,10 @@ class TestJailJudge:
 
         assert isinstance(result, dict)
         assert "p_harmful" in result
-        assert "raw_scores" in result
+        assert "rating" in result
         assert "reason" in result
         assert len(result["p_harmful"]) == 0
-        assert len(result["raw_scores"]) == 0
+        assert len(result["rating"]) == 0
         assert len(result["reason"]) == 0
 
     @pytest.mark.slow
@@ -156,7 +156,7 @@ class TestJailJudge:
 
         assert isinstance(result, dict)
         assert "p_harmful" in result
-        assert "raw_scores" in result
+        assert "rating" in result
         assert "reason" in result
         assert len(result["p_harmful"]) == len(mixed_chats)
 
@@ -298,7 +298,7 @@ class TestJailJudge:
 
         # Results should be identical (no sampling)
         assert result1["p_harmful"] == result2["p_harmful"]
-        assert result1["raw_scores"] == result2["raw_scores"]
+        assert result1["rating"] == result2["rating"]
 
     @pytest.mark.slow
     def test_inference_runs_successfully(self, jailjudge_instance):
@@ -318,13 +318,13 @@ class TestJailJudge:
         # Verify we get a valid result
         assert isinstance(result, dict)
         assert "p_harmful" in result
-        assert "raw_scores" in result
+        assert "rating" in result
         assert "reason" in result
         assert len(result["p_harmful"]) == 1
         if result["p_harmful"][0] is not None:
             assert isinstance(result["p_harmful"][0], float)
-        if result["raw_scores"][0] is not None:
-            assert isinstance(result["raw_scores"][0], int)
+        if result["rating"][0] is not None:
+            assert isinstance(result["rating"][0], int)
 
     def test_chat_template_format(self, jailjudge_instance):
         """Test that chat template is properly formatted."""
@@ -393,7 +393,7 @@ class TestJailJudge:
 
         assert isinstance(result, dict)
         assert len(result["p_harmful"]) == len(sample_chats)
-        assert len(result["raw_scores"]) == len(sample_chats)
+        assert len(result["rating"]) == len(sample_chats)
         assert len(result["reason"]) == len(sample_chats)
 
     def test_regex_patterns(self, jailjudge_instance):
@@ -429,5 +429,5 @@ class TestJailJudge:
 
         assert isinstance(result, dict)
         assert len(result["p_harmful"]) == 1
-        assert len(result["raw_scores"]) == 1
+        assert len(result["rating"]) == 1
         assert len(result["reason"]) == 1

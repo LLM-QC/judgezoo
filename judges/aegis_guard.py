@@ -210,7 +210,7 @@ Provide your safety assessment for Assistant in the above conversation:
             return {"p_harmful": []}
 
         if not self.validate_chats(chats):
-            return [None] * len(chats)
+            return {"p_harmful": [None] * len(chats)}
 
         questions = [chat[0]["content"] for chat in chats]
         answers = [chat[1]["content"] for chat in chats]

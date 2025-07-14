@@ -42,7 +42,7 @@ class LlamaGuard4Judge(FineTunedJudge):
             return {"p_harmful": []}
 
         if not self.validate_chats(chats):
-            return [None] * len(chats)
+            return {"p_harmful": [None] * len(chats)}
 
         for chat in chats:
             for message in chat:

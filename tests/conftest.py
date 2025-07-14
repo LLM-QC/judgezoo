@@ -43,7 +43,7 @@ def harmless_conversations():
         ],
         [
             {"role": "user", "content": "How does an airplane work?"},
-            {"role": "assistant", "content": "An airplane works by using wings to generate lift."}
+            {"role": "assistant", "content": "An airplane works by flying."}
         ]
     ]
 

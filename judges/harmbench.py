@@ -132,7 +132,7 @@ Answer:""",
             return {"p_harmful": []}
 
         if not self.validate_chats(chats):
-            return [None] * len(chats)
+            return {"p_harmful": [None] * len(chats)}
 
         cls_prompt = self.tokenizer.apply_chat_template(
             self.CLS_CONVERSATION, tokenize=False

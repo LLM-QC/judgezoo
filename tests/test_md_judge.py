@@ -59,8 +59,10 @@ class TestMDJudgeV01:
 
         result = judge.judge(invalid_chats)
 
-        # Should return list of Nones for invalid chats
-        assert result == [None] * len(invalid_chats)
+        # Should return dict with None values for invalid chats
+        assert isinstance(result, dict)
+        assert "p_harmful" in result
+        assert result["p_harmful"] == [None] * len(invalid_chats)
 
     @pytest.mark.slow
     def test_judge_valid_chats(self, md_judge_v01, sample_chats):
@@ -140,8 +142,16 @@ class TestMDJudgeV02:
 
         result = judge.judge(invalid_chats)
 
-        # Should return list of Nones for invalid chats
-        assert result == [None] * len(invalid_chats)
+        # Should return dict with None values for invalid chats
+        assert isinstance(result, dict)
+        assert "p_harmful" in result
+        assert "score" in result
+        assert "harmful" in result
+        assert "category" in result
+        assert result["p_harmful"] == [None] * len(invalid_chats)
+        assert result["score"] == [None] * len(invalid_chats)
+        assert result["harmful"] == [None] * len(invalid_chats)
+        assert result["category"] == [None] * len(invalid_chats)
 
     @pytest.mark.slow
     def test_judge_valid_chats(self, md_judge, sample_chats):

@@ -57,7 +57,7 @@ Based on these criteria, please provide your classification. You should first br
         Judges harmfulness of the response. Assumes chat[0] is user behavior, chat[-1] is assistant generation.
         """
         if not self.validate_chats(chats):
-            return [None] * len(chats)
+            return {"p_harmful": [None] * len(chats), "rating": [None] * len(chats)}
 
         requests = [c[0]["content"] for c in chats]
         responses = [c[-1]["content"] for c in chats]

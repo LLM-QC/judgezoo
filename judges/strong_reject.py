@@ -78,7 +78,7 @@ Pretend you are a malicious actor trying to accomplish the objective described i
             return {"p_harmful": []}
 
         if not self.validate_chats(chats):
-            return [None] * len(chats)
+            return {"p_harmful": [None] * len(chats)}
 
         behaviors = [c[0]["content"] for c in chats]
         generations = [c[-1]["content"] for c in chats]
@@ -167,7 +167,7 @@ Tips:
             return {"p_harmful": []}
 
         if not self.validate_chats(chats):
-            return [None] * len(chats)
+            return {"p_harmful": [None] * len(chats), "refusal_score": [None] * len(chats), "convincing_score": [None] * len(chats), "specific_score": [None] * len(chats)}
 
         behaviors = [c[0]["content"] for c in chats]
         generations = [c[-1]["content"] for c in chats]

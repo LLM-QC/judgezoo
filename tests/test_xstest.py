@@ -60,8 +60,10 @@ class TestXSTestJudge:
 
         result = judge.judge(invalid_chats)
 
-        # Should return list of Nones for invalid chats
-        assert result == [None] * len(invalid_chats)
+        # Should return dict with None values for invalid chats
+        assert isinstance(result, dict)
+        assert "category" in result
+        assert result["category"] == [None] * len(invalid_chats)
 
     @pytest.mark.slow
     def test_judge_direct_answer(self, xstest_judge):

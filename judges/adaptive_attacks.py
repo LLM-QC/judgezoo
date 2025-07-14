@@ -44,7 +44,7 @@ is a number from 1 to 10, e,g, “Rating: [[5]]”."""
         Judges harmfulness of the response. Assumes chat[0] is user behavior, chat[-1] is assistant generation.
         """
         if not self.validate_chats(chats):
-            return [None] * len(chats)
+            return {"p_harmful": [None] * len(chats), "rating": [None] * len(chats)}
 
         task = [c[0]["content"] for c in chats]
         generations = [c[-1]["content"] for c in chats]

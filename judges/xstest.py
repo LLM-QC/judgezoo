@@ -53,7 +53,7 @@ CLASS:"""
         Judges OverRefusal. Assumes chat[0] is user behavior, chat[-1] is assistant generation.
         """
         if not self.validate_chats(chats):
-            return [None] * len(chats)
+            return {"category": [None] * len(chats)}
 
         behaviors = [c[0]["content"] for c in chats]
         generations = [c[-1]["content"] for c in chats]

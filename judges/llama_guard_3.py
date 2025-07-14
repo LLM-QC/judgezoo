@@ -49,7 +49,7 @@ class LlamaGuard3Judge(FineTunedJudge):
             return {"p_harmful": []}
 
         if not self.validate_chats(chats):
-            return [None] * len(chats)
+            return {"p_harmful": [None] * len(chats)}
 
         # Llama Guard expects the *full* chat history
         inputs = self.tokenizer.apply_chat_template(

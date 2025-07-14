@@ -137,8 +137,10 @@ class TestHarmbenchJudge:
 
         result = judge.judge(invalid_chats)
 
-        # Should return list of Nones for invalid chats
-        assert result == [None] * len(invalid_chats)
+        # Should return dict with None values for invalid chats
+        assert isinstance(result, dict)
+        assert "p_harmful" in result
+        assert result["p_harmful"] == [None] * len(invalid_chats)
 
     def test_judge_invalid_chats_mistral(self, harmbench_judge_mistral, invalid_chats):
         """Test judge method with invalid chats using Mistral classifier."""
@@ -146,8 +148,10 @@ class TestHarmbenchJudge:
 
         result = judge.judge(invalid_chats)
 
-        # Should return list of Nones for invalid chats
-        assert result == [None] * len(invalid_chats)
+        # Should return dict with None values for invalid chats
+        assert isinstance(result, dict)
+        assert "p_harmful" in result
+        assert result["p_harmful"] == [None] * len(invalid_chats)
 
     @pytest.mark.slow
     def test_judge_safe_conversation(self, harmbench_judge, harmless_conversations):

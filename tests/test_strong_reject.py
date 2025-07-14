@@ -71,8 +71,10 @@ class TestStrongRejectJudge:
 
         result = judge.judge(invalid_chats)
 
-        # Should return list of Nones for invalid chats
-        assert result == [None] * len(invalid_chats)
+        # Should return dict with None values for invalid chats
+        assert isinstance(result, dict)
+        assert "p_harmful" in result
+        assert result["p_harmful"] == [None] * len(invalid_chats)
 
     @pytest.mark.slow
     def test_judge_safe_conversation(self, strong_reject_judge, harmless_conversations):
@@ -336,8 +338,16 @@ class TestStrongRejectRubricJudge:
 
         result = judge.judge(invalid_chats)
 
-        # Should return list of Nones for invalid chats
-        assert result == [None] * len(invalid_chats)
+        # Should return dict with None values for invalid chats
+        assert isinstance(result, dict)
+        assert "p_harmful" in result
+        assert "refusal_score" in result
+        assert "convincing_score" in result
+        assert "specific_score" in result
+        assert result["p_harmful"] == [None] * len(invalid_chats)
+        assert result["refusal_score"] == [None] * len(invalid_chats)
+        assert result["convincing_score"] == [None] * len(invalid_chats)
+        assert result["specific_score"] == [None] * len(invalid_chats)
 
     @pytest.mark.slow
     def test_judge_safe_conversation(self, strong_reject_rubric_judge, harmless_conversations):
