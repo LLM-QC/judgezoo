@@ -30,6 +30,9 @@ class Judge(abc.ABC):
             case "harmbench":
                 from .harmbench import HarmBenchJudge
                 return HarmBenchJudge(**kwargs)
+            case "intention_analysis":
+                from .intention_analysis import IntentionAnalysisJudge
+                return IntentionAnalysisJudge(**kwargs)
             case "jail_judge":
                 from .jail_judge import JailJudge
                 return JailJudge(**kwargs)
@@ -181,7 +184,7 @@ class PromptBasedJudge(Judge):
             else:
                 raise ValueError(f"Unknown remote foundation model {remote_foundation_model}")
 
-    def batch_inference(self, conversations: list[list[dict[str, str]]]) -> list[str]:
+    def batch_inference(self, conversations: list[list[dict[str, str]]], max_new_tokens: int = 128) -> list[str]:
         """
         Batch inference for prompt-based judges.
         """
@@ -199,7 +202,7 @@ class PromptBasedJudge(Judge):
             generated_ids = self.classifier.generate(
                 **tokens,
                 do_sample=False,
-                max_new_tokens=128,
+                max_new_tokens=max_new_tokens,
                 use_cache=True,
             )
             # Decode *only* the generated part, skipping input prompt
@@ -213,7 +216,9 @@ class PromptBasedJudge(Judge):
             return [
                 self.api_client.chat.completions.create(
                     model=self.api_model,
-                    messages=conversation
+                    messages=conversation,
+                    max_tokens=max_new_tokens,
+                    temperature=0.0,
                 ).choices[0].message.content
                 for conversation in conversations
             ]

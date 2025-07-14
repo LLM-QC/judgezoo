@@ -3,6 +3,7 @@
 import logging
 import os
 import sys
+from unittest.mock import patch
 
 import pytest
 
@@ -35,6 +36,29 @@ def adaptive_attacks_judge_local():
 class TestAdaptiveAttacksJudge:
     """Test the Adaptive Attacks Judge implementation."""
 
+    def test_init_with_local_model_warning(self, caplog):
+        """Test that warning is logged when using local model."""
+        with patch("judges.config.USE_LOCAL_MODEL", True):
+            with caplog.at_level(logging.WARNING):
+                judge = AdaptiveAttacksJudge()
+                assert "AdaptiveAttacksJudge originally used gpt-4-0613" in caplog.text
+
+    def test_init_with_different_remote_model_warning(self, caplog):
+        """Test that warning is logged when using different remote model."""
+        with patch("judges.config.USE_LOCAL_MODEL", False), \
+             patch("judges.config.REMOTE_FOUNDATION_MODEL", "gpt-3.5-turbo"):
+            with caplog.at_level(logging.WARNING):
+                judge = AdaptiveAttacksJudge(remote_foundation_model="gpt-3.5-turbo")
+                assert "AdaptiveAttacksJudge originally used gpt-4-0613" in caplog.text
+
+    def test_init_with_correct_remote_model_no_warning(self, caplog):
+        """Test that no warning is logged when using original model."""
+        with patch("judges.config.USE_LOCAL_MODEL", False), \
+             patch("judges.config.REMOTE_FOUNDATION_MODEL", "gpt-4-0613"):
+            with caplog.at_level(logging.WARNING):
+                judge = AdaptiveAttacksJudge(remote_foundation_model="gpt-4-0613")
+                assert "AdaptiveAttacksJudge originally used gpt-4-0613" not in caplog.text
+
     @pytest.mark.slow
     def test_init(self, adaptive_attacks_judge):
         """Test AdaptiveAttacksJudge initialization."""
@@ -42,8 +66,8 @@ class TestAdaptiveAttacksJudge:
 
         # Verify the judge was created successfully
         assert judge is not None
-        assert hasattr(judge, 'JUDGE_PROMPT')
-        assert hasattr(judge, 'CLASSIFICATION_PATTERN')
+        assert hasattr(judge, "JUDGE_PROMPT")
+        assert hasattr(judge, "CLASSIFICATION_PATTERN")
 
         # Verify the prompt contains expected elements
         assert "red teaming assistant" in judge.JUDGE_PROMPT
@@ -55,8 +79,8 @@ class TestAdaptiveAttacksJudge:
         """Test AdaptiveAttacksJudge initialization with local model."""
         judge = adaptive_attacks_judge_local
         assert judge is not None
-        assert hasattr(judge, 'JUDGE_PROMPT')
-        assert hasattr(judge, 'CLASSIFICATION_PATTERN')
+        assert hasattr(judge, "JUDGE_PROMPT")
+        assert hasattr(judge, "CLASSIFICATION_PATTERN")
 
     @pytest.mark.slow
     def test_judge_valid_chats(self, adaptive_attacks_judge, sample_chats):
