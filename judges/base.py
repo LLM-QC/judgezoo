@@ -30,6 +30,9 @@ class Judge(abc.ABC):
             case "harmbench":
                 from .harmbench import HarmBenchJudge
                 return HarmBenchJudge(**kwargs)
+            case "jailjudge":
+                from .jailjudge import JailJudge
+                return JailJudge(**kwargs)
             case "llama_guard_3":
                 from .llama_guard_3 import LlamaGuard3Judge
                 return LlamaGuard3Judge(**kwargs)
