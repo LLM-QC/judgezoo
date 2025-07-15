@@ -19,6 +19,7 @@ harmfulness scores to competent and compliant responses, even if they are not ha
 }
 """
 
+import logging
 import re
 
 import torch
@@ -152,6 +153,18 @@ Tips:
         """,
         flags=re.DOTALL | re.MULTILINE | re.VERBOSE,
     )
+
+    def __init__(
+        self,
+        use_local_model: bool | None = None,
+        local_foundation_model: str | None = None,
+        remote_foundation_model: str | None = None,
+    ):
+        super().__init__(use_local_model, local_foundation_model, remote_foundation_model)
+        if self.use_local_model:
+            logging.warning(f"StrongRejectRubricJudge originally used gpt-4o-mini, you are using {local_foundation_model}. Results may differ from the original paper.")
+        elif not self.use_local_model and remote_foundation_model != "gpt-4o-mini":
+            logging.warning(f"StrongRejectRubricJudge originally used gpt-4o-mini, you are using {remote_foundation_model}. Results may differ from the original paper.")
 
     def judge(
         self,
