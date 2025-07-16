@@ -61,7 +61,7 @@ class Judge(abc.ABC):
     def judge(
         self,
         chats: list[list[dict[str, str]]],
-    ) -> dict[str, list[float]] | None:
+    ) -> dict[str, list[float | None]]:
         """
         Judges a batch of interactions (chats).
 

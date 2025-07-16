@@ -7,10 +7,10 @@ import re
 
 import pytest
 
-# Add the parent directory to the path to import judges
+# Add the parent directory to the path to import judgezoo
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from judges.jail_judge import JailJudge
+from judgezoo.jail_judge import JailJudge
 
 
 @pytest.fixture(scope="module")
@@ -275,7 +275,7 @@ class TestJailJudge:
 
     def test_inheritance(self, jailjudge_instance):
         """Test that JailJudge properly inherits from FineTunedJudge."""
-        from judges.base import FineTunedJudge
+        from judgezoo.base import FineTunedJudge
 
         judge = jailjudge_instance
         assert isinstance(judge, FineTunedJudge)

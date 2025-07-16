@@ -1,4 +1,4 @@
-"""Pytest configuration and fixtures for judges testing."""
+"""Pytest configuration and fixtures for judgezoo testing."""
 
 import gc
 from unittest.mock import Mock, patch

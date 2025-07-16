@@ -1,6 +1,6 @@
 # Judges
 
-This repo provides access to a set of commonly used LLM-based safety judges via a simple and consistent API.
+This repo provides access to a set of commonly used LLM-based safety judgezoo via a simple and consistent API.
 Our main focus is ease-of-use, correctness, and reproducibility.
 
 
@@ -22,7 +22,7 @@ scores = judge([harmless_conversation])
 print(scores)
 >>> {"p_harmful": [0.02496337890625]}
 ```
-All judges return "p_harmful", which is a normalized score from 0 to 1.
+All judgezoo return "p_harmful", which is a normalized score from 0 to 1.
 Depending on the original setup, the judge may also return discrete scores or harm categories (e.g. on a Likert scale).
 In these cases, the raw scores are also returned:
 
@@ -35,7 +35,7 @@ print(scores)
 ```
 
 
-## Included judges
+## Included judgezoo
 | Name                   | Argument              | Creator (Org/Researcher)     | Link to Paper                                       | Type         | Fine-tuned from        |
 | ---------------------- | --------------------- | ---------------------------- | ----------------------------------------------------| ------------ | ---------------------- |
 | Adaptive Attacks       | `adaptive_attacks`    | Andriushchenko et al. (2024) | [arXiv:2404.02151](https://arxiv.org/abs/2404.02151)| prompt-based | —                      |
@@ -53,9 +53,9 @@ print(scores)
 
 
 ## Other
-### Prompt-based judges
+### Prompt-based judgezoo
 
-While some judges (such as the HarmBench classifier) are finetuned local models, others rely on prompted foundation models.
+While some judgezoo (such as the HarmBench classifier) are finetuned local models, others rely on prompted foundation models.
 Currently, we support local foundation models and OpenAI models:
 
 ```python3
@@ -89,7 +89,7 @@ Wherever possible, we use official code directly provided by the original author
 Finally, we warn if a user's setup diverges from the original implementation:
 
 ```python3
-from judges import Judge
+from judgezoo import Judge
 
 judge = Judge.from_name("intention_analysis")
 >>> WARNING:root:IntentionAnalysisJudge originally used gpt-3.5-turbo-0613, you are using gpt-4o. Results may differ from the original paper.
@@ -97,7 +97,7 @@ judge = Judge.from_name("intention_analysis")
 
 
 ## Installation (not on pypi yet)
-```pip install judges```
+```pip install judgezoo```
 
 
 ## Tests

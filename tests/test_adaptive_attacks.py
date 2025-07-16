@@ -7,10 +7,10 @@ from unittest.mock import patch
 
 import pytest
 
-# Add the parent directory to the path to import judges
+# Add the parent directory to the path to import judgezoo
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from judges.adaptive_attacks import AdaptiveAttacksJudge
+from judgezoo.adaptive_attacks import AdaptiveAttacksJudge
 
 
 @pytest.fixture(scope="module")
@@ -38,23 +38,23 @@ class TestAdaptiveAttacksJudge:
 
     def test_init_with_local_model_warning(self, caplog):
         """Test that warning is logged when using local model."""
-        with patch("judges.config.USE_LOCAL_MODEL", True):
+        with patch("judgezoo.config.USE_LOCAL_MODEL", True):
             with caplog.at_level(logging.WARNING):
                 judge = AdaptiveAttacksJudge()
                 assert "AdaptiveAttacksJudge originally used gpt-4-0613" in caplog.text
 
     def test_init_with_different_remote_model_warning(self, caplog):
         """Test that warning is logged when using different remote model."""
-        with patch("judges.config.USE_LOCAL_MODEL", False), \
-             patch("judges.config.REMOTE_FOUNDATION_MODEL", "gpt-3.5-turbo"):
+        with patch("judgezoo.config.USE_LOCAL_MODEL", False), \
+             patch("judgezoo.config.REMOTE_FOUNDATION_MODEL", "gpt-3.5-turbo"):
             with caplog.at_level(logging.WARNING):
                 judge = AdaptiveAttacksJudge(remote_foundation_model="gpt-3.5-turbo")
                 assert "AdaptiveAttacksJudge originally used gpt-4-0613" in caplog.text
 
     def test_init_with_correct_remote_model_no_warning(self, caplog):
         """Test that no warning is logged when using original model."""
-        with patch("judges.config.USE_LOCAL_MODEL", False), \
-             patch("judges.config.REMOTE_FOUNDATION_MODEL", "gpt-4-0613"):
+        with patch("judgezoo.config.USE_LOCAL_MODEL", False), \
+             patch("judgezoo.config.REMOTE_FOUNDATION_MODEL", "gpt-4-0613"):
             with caplog.at_level(logging.WARNING):
                 judge = AdaptiveAttacksJudge(remote_foundation_model="gpt-4-0613")
                 assert "AdaptiveAttacksJudge originally used gpt-4-0613" not in caplog.text
@@ -221,7 +221,7 @@ class TestAdaptiveAttacksJudge:
 
     def test_inheritance(self, adaptive_attacks_judge):
         """Test that AdaptiveAttacksJudge properly inherits from PromptBasedJudge."""
-        from judges.base import PromptBasedJudge
+        from judgezoo.base import PromptBasedJudge
 
         judge = adaptive_attacks_judge
         assert isinstance(judge, PromptBasedJudge)

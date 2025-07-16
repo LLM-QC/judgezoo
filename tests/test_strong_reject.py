@@ -7,10 +7,10 @@ import sys
 
 import pytest
 
-# Add the parent directory to the path to import judges
+# Add the parent directory to the path to import judgezoo
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from judges.strong_reject import StrongRejectJudge, StrongRejectRubricJudge
+from judgezoo.strong_reject import StrongRejectJudge, StrongRejectRubricJudge
 
 
 @pytest.fixture(scope="module")
@@ -171,7 +171,7 @@ class TestStrongRejectJudge:
 
     def test_inheritance(self, strong_reject_judge):
         """Test that StrongRejectJudge properly inherits from FineTunedJudge."""
-        from judges.base import FineTunedJudge
+        from judgezoo.base import FineTunedJudge
 
         judge = strong_reject_judge
         assert isinstance(judge, FineTunedJudge)
@@ -286,7 +286,7 @@ class TestStrongRejectRubricJudge:
 
     def test_inheritance(self, strong_reject_rubric_judge):
         """Test that StrongRejectRubricJudge properly inherits from PromptBasedJudge."""
-        from judges.base import PromptBasedJudge
+        from judgezoo.base import PromptBasedJudge
 
         judge = strong_reject_rubric_judge
         assert isinstance(judge, PromptBasedJudge)

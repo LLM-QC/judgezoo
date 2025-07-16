@@ -6,10 +6,10 @@ import sys
 
 import pytest
 
-# Add the parent directory to the path to import judges
+# Add the parent directory to the path to import judgezoo
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from judges.harmbench import HarmBenchClassifier, HarmBenchJudge
+from judgezoo.harmbench import HarmBenchClassifier, HarmBenchJudge
 
 
 @pytest.fixture(scope="module")
@@ -341,14 +341,14 @@ class TestHarmbenchJudge:
 
     def test_inheritance(self, harmbench_judge):
         """Test that HarmBenchJudge properly inherits from FineTunedJudge."""
-        from judges.base import FineTunedJudge
+        from judgezoo.base import FineTunedJudge
 
         judge = harmbench_judge
         assert isinstance(judge, FineTunedJudge)
 
     def test_inheritance_mistral(self, harmbench_judge_mistral):
         """Test that HarmBenchJudge with Mistral properly inherits from FineTunedJudge."""
-        from judges.base import FineTunedJudge
+        from judgezoo.base import FineTunedJudge
 
         judge = harmbench_judge_mistral
         assert isinstance(judge, FineTunedJudge)

@@ -6,10 +6,10 @@ import sys
 
 import pytest
 
-# Add the parent directory to the path to import judges
+# Add the parent directory to the path to import judgezoo
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from judges.llama_guard_3 import LlamaGuard3Judge
+from judgezoo.llama_guard_3 import LlamaGuard3Judge
 
 
 @pytest.fixture(scope="module")
@@ -163,7 +163,7 @@ class TestLlamaGuard3Judge:
 
     def test_inheritance(self, llama_guard_judge):
         """Test that LlamaGuard3Judge properly inherits from FineTunedJudge."""
-        from judges.base import FineTunedJudge
+        from judgezoo.base import FineTunedJudge
 
         judge = llama_guard_judge
         assert isinstance(judge, FineTunedJudge)

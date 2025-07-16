@@ -1,1 +1,1 @@
-# Tests package for judges
+# Tests package for judgezoo

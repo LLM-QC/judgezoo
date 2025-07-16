@@ -6,10 +6,10 @@ import sys
 
 import pytest
 
-# Add the parent directory to the path to import judges
+# Add the parent directory to the path to import judgezoo
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from judges.xstest import XSTestJudge
+from judgezoo.xstest import XSTestJudge
 
 
 @pytest.fixture(scope="module")
@@ -183,7 +183,7 @@ class TestXSTestJudge:
 
     def test_inheritance(self, xstest_judge):
         """Test that XSTestJudge properly inherits from PromptBasedJudge."""
-        from judges.base import PromptBasedJudge
+        from judgezoo.base import PromptBasedJudge
 
         judge = xstest_judge
         assert isinstance(judge, PromptBasedJudge)

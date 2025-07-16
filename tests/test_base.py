@@ -7,10 +7,10 @@ from unittest.mock import Mock, patch
 import pytest
 import torch
 
-# Add the parent directory to the path to import judges
+# Add the parent directory to the path to import judgezoo
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from judges.base import FineTunedJudge, Judge, PromptBasedJudge
+from judgezoo.base import FineTunedJudge, Judge, PromptBasedJudge
 
 
 class TestJudge:
@@ -18,25 +18,25 @@ class TestJudge:
 
     def test_from_name_harmbench(self):
         """Test creating Harmbench judge from name."""
-        with patch('judges.harmbench.HarmBenchJudge') as mock_harmbench:
+        with patch('judgezoo.harmbench.HarmBenchJudge') as mock_harmbench:
             judge = Judge.from_name("harmbench")
             mock_harmbench.assert_called_once()
 
     def test_from_name_llama_guard_3(self):
         """Test creating Llama Guard 3 judge from name."""
-        with patch('judges.llama_guard_3.LlamaGuard3Judge') as mock_lg3:
+        with patch('judgezoo.llama_guard_3.LlamaGuard3Judge') as mock_lg3:
             judge = Judge.from_name("llama_guard_3")
             mock_lg3.assert_called_once()
 
     def test_from_name_strong_reject(self):
         """Test creating Strong Reject judge from name."""
-        with patch('judges.strong_reject.StrongRejectJudge') as mock_sr:
+        with patch('judgezoo.strong_reject.StrongRejectJudge') as mock_sr:
             judge = Judge.from_name("strong_reject")
             mock_sr.assert_called_once()
 
     def test_from_name_xstest(self):
         """Test creating XSTest judge from name."""
-        with patch('judges.xstest.XSTestJudge') as mock_xs:
+        with patch('judgezoo.xstest.XSTestJudge') as mock_xs:
             judge = Judge.from_name("xstest")
             mock_xs.assert_called_once()
 
@@ -124,7 +124,7 @@ class TestJudge:
         assert " is longer than the specified maximum sequence length" in caplog.text
         assert result == mock_encoded
 
-    @patch('judges.base.with_max_batchsize')
+    @patch('judgezoo.base.with_max_batchsize')
     def test_call_method(self, mock_with_max_batchsize, sample_chats):
         """Test the __call__ method delegates to with_max_batchsize."""
         # Create a concrete Judge subclass for testing
@@ -147,7 +147,7 @@ class TestJudge:
 class TestPromptBasedJudge:
     """Test the PromptBasedJudge class."""
 
-    @patch('judges.config.USE_LOCAL_MODEL', True)
+    @patch('judgezoo.config.USE_LOCAL_MODEL', True)
     def test_init_local_model(self):
         """Test initialization with local model."""
         class ConcretePromptBasedJudge(PromptBasedJudge):
@@ -162,8 +162,8 @@ class TestPromptBasedJudge:
         assert judge.classifier is not None
         assert judge.tokenizer is not None
 
-    @patch('judges.config.USE_LOCAL_MODEL', False)
-    @patch('judges.config.REMOTE_FOUNDATION_MODEL', 'gpt-4o')
+    @patch('judgezoo.config.USE_LOCAL_MODEL', False)
+    @patch('judgezoo.config.REMOTE_FOUNDATION_MODEL', 'gpt-4o')
     @patch.dict(os.environ, {'OPENAI_API_KEY': 'test-key'})
     def test_init_remote_model_openai(self):
         """Test initialization with remote OpenAI model."""
@@ -177,8 +177,8 @@ class TestPromptBasedJudge:
         assert judge.api_model == 'gpt-4o'
         assert judge.classifier is None
 
-    @patch('judges.config.USE_LOCAL_MODEL', False)
-    @patch('judges.config.REMOTE_FOUNDATION_MODEL', 'unknown-model')
+    @patch('judgezoo.config.USE_LOCAL_MODEL', False)
+    @patch('judgezoo.config.REMOTE_FOUNDATION_MODEL', 'unknown-model')
     def test_init_remote_model_unknown(self):
         """Test initialization with unknown remote model."""
         with pytest.raises(ValueError, match="Unknown remote foundation model unknown-model"):
@@ -190,9 +190,9 @@ class TestPromptBasedJudge:
     @pytest.mark.slow
     def test_batch_inference_local(self, harmless_conversations):
         """Test batch inference with local model using AdaptiveAttacksJudge."""
-        from judges.adaptive_attacks import AdaptiveAttacksJudge
+        from judgezoo.adaptive_attacks import AdaptiveAttacksJudge
 
-        with patch('judges.config.USE_LOCAL_MODEL', True):
+        with patch('judgezoo.config.USE_LOCAL_MODEL', True):
 
             judge = AdaptiveAttacksJudge()
 
@@ -212,14 +212,14 @@ class TestPromptBasedJudge:
     @pytest.mark.slow
     def test_batch_inference_remote(self, harmless_conversations):
         """Test batch inference with remote API using AdaptiveAttacksJudge."""
-        from judges.adaptive_attacks import AdaptiveAttacksJudge
+        from judgezoo.adaptive_attacks import AdaptiveAttacksJudge
 
         # Skip if no API key is available
         if not os.getenv('OPENAI_API_KEY'):
             pytest.skip("OPENAI_API_KEY not set")
 
-        with patch('judges.config.USE_LOCAL_MODEL', False), \
-             patch('judges.config.REMOTE_FOUNDATION_MODEL', 'gpt-4o'):
+        with patch('judgezoo.config.USE_LOCAL_MODEL', False), \
+             patch('judgezoo.config.REMOTE_FOUNDATION_MODEL', 'gpt-4o'):
             judge = AdaptiveAttacksJudge()
 
             # Test with simple inputs

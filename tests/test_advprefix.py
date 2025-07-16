@@ -8,10 +8,10 @@ import sys
 import pytest
 import torch
 
-# Add the parent directory to the path to import judges
+# Add the parent directory to the path to import judgezoo
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from judges.advprefix import AdvPrefixJudge
+from judgezoo.advprefix import AdvPrefixJudge
 
 
 @pytest.fixture(scope="module")
@@ -211,7 +211,7 @@ class TestAdvPrefixJudge:
 
     def test_inheritance(self, advprefix_judge):
         """Test that AdvPrefixJudge properly inherits from PromptBasedJudge."""
-        from judges.base import PromptBasedJudge
+        from judgezoo.base import PromptBasedJudge
 
         judge = advprefix_judge
         assert isinstance(judge, PromptBasedJudge)

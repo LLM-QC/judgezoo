@@ -7,10 +7,10 @@ from unittest.mock import patch
 import pytest
 import torch
 
-# Add the parent directory to the path to import judges
+# Add the parent directory to the path to import judgezoo
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from judges._utils import free_vram, with_max_batchsize
+from judgezoo._utils import free_vram, with_max_batchsize
 
 
 class TestWithMaxBatchsize:
@@ -112,7 +112,7 @@ class TestWithMaxBatchsize:
 
         inputs = [1, 2, 3, 4, 5, 6, 7, 8]
 
-        with patch('judges._utils.free_vram') as mock_free:
+        with patch('judgezoo._utils.free_vram') as mock_free:
             result = with_max_batchsize(oom_function, inputs, initial_batch_size=8)
 
         assert result == [2, 4, 6, 8, 10, 12, 14, 16]
@@ -126,7 +126,7 @@ class TestWithMaxBatchsize:
 
         inputs = [1, 2]
 
-        with patch('judges._utils.free_vram'):
+        with patch('judgezoo._utils.free_vram'):
             with pytest.raises(RuntimeError, match="OOM even with batch_size=1"):
                 with_max_batchsize(always_oom_function, inputs, initial_batch_size=4)
 
@@ -270,7 +270,7 @@ class TestIntegration:
 
         inputs = list(range(10))  # 10 samples
 
-        with patch('judges._utils.free_vram') as mock_free:
+        with patch('judgezoo._utils.free_vram') as mock_free:
             result = with_max_batchsize(simulate_model_inference, inputs, initial_batch_size=8)
 
         # Should complete successfully
@@ -296,7 +296,7 @@ class TestIntegration:
 
         inputs = list(range(16))  # 16 samples
 
-        with patch('judges._utils.free_vram'):
+        with patch('judgezoo._utils.free_vram'):
             output = with_max_batchsize(track_batch_sizes, inputs, initial_batch_size=16)
 
         # Should start with large batch and progressively reduce
