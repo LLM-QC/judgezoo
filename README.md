@@ -22,7 +22,7 @@ scores = judge([harmless_conversation])
 print(scores)
 >>> {"p_harmful": [0.02496337890625]}
 ```
-All judgezoo return "p_harmful", which is a normalized score from 0 to 1.
+All judges return `"p_harmful"`, which is a normalized score from 0 to 1.
 Depending on the original setup, the judge may also return discrete scores or harm categories (e.g. on a Likert scale).
 In these cases, the raw scores are also returned:
 
