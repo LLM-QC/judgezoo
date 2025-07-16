@@ -4,6 +4,13 @@ This repo provides access to a set of commonly used LLM-based safety judges via 
 Our main focus is ease-of-use, correctness, and reproducibility.
 
 
+## The Problem
+
+Evaluations in the safety/robustness literature are highly fragmented, with researchers using different judges, prompting strategies, and model versions.
+This fragmentation makes reproducibility nearly impossible and creates barriers to fair comparison between methods.
+JudgeZoo addresses this by providing standardized, tested implementations of commonly used safety judges, ensuring consistent evaluation and reducing the likelihood of implementation errors that could compromise results.
+
+
 ## How to use
 
 You can create a judge model instance with a single line of code:
@@ -105,3 +112,17 @@ judge = Judge.from_name("intention_analysis")
 To run all tests, run
 
 ```pytest tests/ --runslow```
+
+
+## Citation
+
+If you use JudgeZoo in your research, please cite:
+
+```bibtex
+@software{judgezoo,
+  title = {JudgeZoo: A Standardized Library for LLM Safety Judges},
+  author = {[Tim Beyer]},
+  year = {2025},
+  url = {https://github.com/LLM-QC/judgezoo},
+}
+```
