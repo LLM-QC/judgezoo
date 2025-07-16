@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="judgezoo",
-    version="0.1.0",
+    version="0.1.1",
     description="A collection of judges for evaluating language model generations",
     author="Tim Beyer",
     author_email="tim.beyer@tum.de",

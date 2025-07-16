@@ -4,11 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "judgezoo"
-version = "0.1.0"
-description = "A collection of judges for evaluating language model generations"
+version = "0.1.1"
+description = "A collection of judges for evaluating LLM model output for safety & toxicity with a standardized API."
 readme = "README.md"
 requires-python = ">=3.8"
-license = "MIT"
 authors = [
     {name = "Tim Beyer", email = "tim.beyer@tum.de"}
 ]
