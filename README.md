@@ -35,7 +35,7 @@ print(scores)
 ```
 
 
-## Included judgezoo
+## Included judges
 | Name                   | Argument              | Creator (Org/Researcher)     | Link to Paper                                       | Type         | Fine-tuned from        |
 | ---------------------- | --------------------- | ---------------------------- | ----------------------------------------------------| ------------ | ---------------------- |
 | Adaptive Attacks       | `adaptive_attacks`    | Andriushchenko et al. (2024) | [arXiv:2404.02151](https://arxiv.org/abs/2404.02151)| prompt-based | —                      |
@@ -54,9 +54,9 @@ print(scores)
 
 
 ## Other
-### Prompt-based judgezoo
+### Prompt-based judges
 
-While some judgezoo (such as the HarmBench classifier) are finetuned local models, others rely on prompted foundation models.
+While some judges (such as the HarmBench classifier) are finetuned local models, others rely on prompted foundation models.
 Currently, we support local foundation models and OpenAI models:
 
 ```python3

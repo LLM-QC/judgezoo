@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "judgezoo"
+version = "0.1.0"
+description = "A collection of judges for evaluating language model generations"
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+authors = [
+    {name = "Tim Beyer", email = "tim.beyer@tum.de"}
+]
+keywords = ["llm", "safety", "evaluation", "ai-safety", "machine-learning"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Security",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "torch>=2.3.1",
+    "transformers>=4.45.0",
+    "numpy",
+    "openai",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov",
+    "pytest-mock",
+]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "pytest-mock",
+    "build",
+    "twine",
+]
+
+[project.urls]
+Homepage = "https://github.com/LLM-QC/judgezoo"
+Repository = "https://github.com/LLM-QC/judgezoo"
+Issues = "https://github.com/LLM-QC/judgezoo/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["judgezoo*"]
+exclude = ["tests*"]
