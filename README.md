@@ -1,4 +1,4 @@
-# <img src="logo.png" alt="JudgeZoo Logo" width="30" height="30"> JudgeZoo
+# <img src="logo.png" alt="JudgeZoo Logo" width="50" height="50"> JudgeZoo
 
 This repo provides access to a set of commonly used LLM-based safety judges via a simple and consistent API.
 Our main focus is ease-of-use, correctness, and reproducibility.
