@@ -1,6 +1,6 @@
-# Judges
+# JudgeZoo
 
-This repo provides access to a set of commonly used LLM-based safety judgezoo via a simple and consistent API.
+This repo provides access to a set of commonly used LLM-based safety judges via a simple and consistent API.
 Our main focus is ease-of-use, correctness, and reproducibility.
 
 
@@ -41,10 +41,11 @@ print(scores)
 | Adaptive Attacks       | `adaptive_attacks`    | Andriushchenko et al. (2024) | [arXiv:2404.02151](https://arxiv.org/abs/2404.02151)| prompt-based | —                      |
 | AdvPrefix              | `advprefix`           | Zhu et al. (2024)            | [arXiv:2412.10321](https://arxiv.org/abs/2412.10321)| prompt-based | —                      |
 | AegisGuard*            | `aegis_guard`         | Ghosh et al. (2024)          | [arXiv:2404.05993](https://arxiv.org/abs/2404.05993)| fine-tuned   | LlamaGuard 7B          |
-| MD-Judge (v0.1 & v0.2) | `md_judge`            | Li, Lijun et al. (2024)      | [arXiv:2402.05044](https://arxiv.org/abs/2402.05044)| fine-tuned   | Mistral-7B/LMintern2 7B|
 | HarmBench              | `harmbench`           | Mazeika et al. (2024)        | [arXiv:2402.04249](https://arxiv.org/abs/2402.04249)| fine-tuned   | Gemma 2B               |
+| JailJudge              | `jail_judge`          | Liu et al. (2024)            | [arXiv:2410.12855](https://arxiv.org/abs/2410.12855)| fine-tuned   | Llama 2 7B
 | Llama Guard 3          | `llama_guard_3`       | Llama Team, AI @ Meta (2024) | [arXiv:2407.21783](https://arxiv.org/abs/2407.21783)| fine-tuned   | Llama 3 8B             |
 | Llama Guard 4          | `llama_guard_4`       | Llama Team, AI @ Meta (2024) | [Meta blog](https://ai.meta.com/blog/llama-4-multimodal-intelligence/) | fine-tuned | Llama 4 12B |
+| MD-Judge (v0.1 & v0.2) | `md_judge`            | Li, Lijun et al. (2024)      | [arXiv:2402.05044](https://arxiv.org/abs/2402.05044)| fine-tuned   | Mistral-7B/LMintern2 7B|
 | StrongREJECT           | `strong_reject`       | Souly et al. (2024)          | [arXiv:2402.10260](https://arxiv.org/abs/2402.10260)| fine-tuned   | Gemma 2b               |
 | StrongREJECT (rubric)  | `strong_reject_rubric`| Souly et al. (2024)          | [arXiv:2402.10260](https://arxiv.org/abs/2402.10260)| prompt-based | -                      |
 | XSTestJudge            | `xstest`              | Röttge et al. (2023)         | [arXiv:2308.01263](https://arxiv.org/abs/2308.01263)| prompt-based | —                      |
