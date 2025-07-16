@@ -97,7 +97,7 @@ judge = Judge.from_name("intention_analysis")
 ```
 
 
-## Installation (not on pypi yet)
+## Installation
 ```pip install judgezoo```
 
 
