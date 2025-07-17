@@ -1,9 +1,8 @@
 import abc
+from anthropic import Anthropic
 import logging
 import os
 from openai import OpenAI
-from anthropic import Anthropic
-
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, PreTrainedTokenizer
 
@@ -215,7 +214,7 @@ class PromptBasedJudge(Judge):
                 self.tokenizer.pad_token_id = 0
         else:
             self.classifier = None
-
+            self.tokenizer = None
             if "gpt" in remote_foundation_model:
                 self.chat_provider = self.OpenAIProvider(
                     model_name=remote_foundation_model
@@ -230,7 +229,10 @@ class PromptBasedJudge(Judge):
                 )
 
     def batch_inference(
-        self, conversations: list[list[dict[str, str]]], max_new_tokens: int = 512
+        self,
+        conversations: list[list[dict[str, str]]],
+        max_new_tokens: int = 512,
+        temperature=0.0,
     ) -> list[str]:
         """
         Batch inference for prompt-based judges.
@@ -262,12 +264,19 @@ class PromptBasedJudge(Judge):
             return generated_texts
         else:
             return [
-                self.chat_provider.generate(conversation, max_new_tokens=max_new_tokens)
+                self.chat_provider.generate(
+                    conversation, max_new_tokens=max_new_tokens, temperature=temperature
+                )
                 for conversation in conversations
             ]
 
     class ChatProvider:
-        def generate(self, input: str) -> str:
+        def generate(
+            self,
+            conversation: list[dict:[str, str]],
+            max_new_tokens: int,
+            temperature: float,
+        ) -> str:
             raise NotImplementedError("Subclasses must implement this method")
 
     class OpenAIProvider(ChatProvider):
@@ -282,12 +291,16 @@ class PromptBasedJudge(Judge):
             self.api_model = model_name
 
         def generate(
-            self, conversation: list[dict:[str, str]], max_new_tokens: int
+            self,
+            conversation: list[dict:[str, str]],
+            max_new_tokens: int,
+            temperature: float,
         ) -> str:
             response = self.api_client.chat.completions.create(
                 model=self.api_model,
                 messages=conversation,
                 max_tokens=max_new_tokens,
+                temperature=temperature,
             )
             return response.choices[0].message.content
 
@@ -303,12 +316,16 @@ class PromptBasedJudge(Judge):
             self.api_model = model_name
 
         def generate(
-            self, conversation: list[dict:[str, str]], max_new_tokens: int
+            self,
+            conversation: list[dict:[str, str]],
+            max_new_tokens: int,
+            temperature: float,
         ) -> str:
             response = self.api_client.messages.create(
                 model=self.api_model,
                 max_tokens=max_new_tokens,
                 messages=conversation,
+                temperature=temperature,
             )
             if response.stop_reason != "end_turn":
                 logging.warning(
