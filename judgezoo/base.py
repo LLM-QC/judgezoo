@@ -5,7 +5,6 @@ from openai import OpenAI
 from anthropic import Anthropic
 
 import torch
-from openai import OpenAI
 from transformers import AutoModelForCausalLM, AutoTokenizer, PreTrainedTokenizer
 
 from ._utils import with_max_batchsize
