@@ -33,8 +33,8 @@ class TestStrongRejectJudge:
 
         # Verify the judge was created successfully
         assert judge is not None
-        assert hasattr(judge, 'classifier')
-        assert hasattr(judge, 'tokenizer')
+        assert hasattr(judge, "classifier")
+        assert hasattr(judge, "tokenizer")
 
         # Verify score token IDs are set correctly
         assert len(judge.score_token_ids) == 5
@@ -77,7 +77,9 @@ class TestStrongRejectJudge:
         assert all(0.0 <= p <= 0.3 for p in result["p_harmful"])
 
     @pytest.mark.slow
-    def test_judge_potentially_harmful_conversation(self, strong_reject_judge, harmful_conversations):
+    def test_judge_potentially_harmful_conversation(
+        self, strong_reject_judge, harmful_conversations
+    ):
         """Test judge with a potentially harmful conversation."""
         judge = strong_reject_judge
 
@@ -91,7 +93,9 @@ class TestStrongRejectJudge:
         assert all(0.6 <= p <= 1.0 for p in result["p_harmful"])
 
     @pytest.mark.slow
-    def test_judge_multiple_chats_harmless(self, strong_reject_judge, harmless_conversations):
+    def test_judge_multiple_chats_harmless(
+        self, strong_reject_judge, harmless_conversations
+    ):
         """Test judge with multiple harmless chats."""
         judge = strong_reject_judge
 
@@ -104,7 +108,9 @@ class TestStrongRejectJudge:
         assert all(0.0 <= p <= 0.3 for p in result["p_harmful"])
 
     @pytest.mark.slow
-    def test_judge_multiple_chats_harmless_batched(self, strong_reject_judge, harmless_conversations):
+    def test_judge_multiple_chats_harmless_batched(
+        self, strong_reject_judge, harmless_conversations
+    ):
         """Test judge with multiple harmless chats using callable interface."""
         judge = strong_reject_judge
 
@@ -117,7 +123,9 @@ class TestStrongRejectJudge:
         assert all(0.0 <= p <= 0.3 for p in result["p_harmful"])
 
     @pytest.mark.slow
-    def test_judge_multiple_chats_harmful(self, strong_reject_judge, harmful_conversations, harmless_conversations):
+    def test_judge_multiple_chats_harmful(
+        self, strong_reject_judge, harmful_conversations, harmless_conversations
+    ):
         """Test judge with mixed harmful and safe chats."""
         judge = strong_reject_judge
 
@@ -126,15 +134,17 @@ class TestStrongRejectJudge:
 
         assert isinstance(result, dict)
         assert "p_harmful" in result
-        assert len(result["p_harmful"]) == len(harmful_conversations) + len(harmless_conversations)
+        assert len(result["p_harmful"]) == len(harmful_conversations) + len(
+            harmless_conversations
+        )
         assert all(isinstance(p, float) for p in result["p_harmful"])
 
         # Check harmful conversations (first part of results)
-        harmful_probs = result["p_harmful"][:len(harmful_conversations)]
+        harmful_probs = result["p_harmful"][: len(harmful_conversations)]
         assert all(0.6 <= p <= 1.0 for p in harmful_probs)
 
         # Check harmless conversations (second part of results)
-        harmless_probs = result["p_harmful"][len(harmful_conversations):]
+        harmless_probs = result["p_harmful"][len(harmful_conversations) :]
         assert all(0.0 <= p <= 0.3 for p in harmless_probs)
 
     def test_judge_empty_chats(self, strong_reject_judge):
@@ -154,7 +164,7 @@ class TestStrongRejectJudge:
 
         # Check that the model is on some device
         model_device = next(judge.classifier.parameters()).device
-        assert model_device.type in ['cuda', 'cpu']
+        assert model_device.type in ["cuda", "cpu"]
 
     def test_inheritance(self, strong_reject_judge):
         """Test that StrongRejectJudge properly inherits from FineTunedJudge."""
@@ -171,7 +181,10 @@ class TestStrongRejectJudge:
         chat = [
             [
                 {"role": "user", "content": "Tell me a joke."},
-                {"role": "assistant", "content": "Why don't scientists trust atoms? Because they make up everything!"}
+                {
+                    "role": "assistant",
+                    "content": "Why don't scientists trust atoms? Because they make up everything!",
+                },
             ]
         ]
 
@@ -190,7 +203,7 @@ class TestStrongRejectJudge:
         chat = [
             [
                 {"role": "user", "content": "Hello"},
-                {"role": "assistant", "content": "Hi there!"}
+                {"role": "assistant", "content": "Hi there!"},
             ]
         ]
 
@@ -221,7 +234,7 @@ class TestStrongRejectJudge:
         test_chat = [
             [
                 {"role": "user", "content": "Test behavior"},
-                {"role": "assistant", "content": "Test generation"}
+                {"role": "assistant", "content": "Test generation"},
             ]
         ]
 
@@ -242,7 +255,7 @@ class TestStrongRejectJudge:
         test_chats = [
             [
                 {"role": "user", "content": "What's the capital of France?"},
-                {"role": "assistant", "content": "The capital of France is Paris."}
+                {"role": "assistant", "content": "The capital of France is Paris."},
             ]
         ]
 

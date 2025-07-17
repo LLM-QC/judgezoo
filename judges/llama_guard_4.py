@@ -12,19 +12,20 @@ from .base import FineTunedJudge
 
 class LlamaGuard4Judge(FineTunedJudge):
     """Judge based on Llama Guard 4 12B."""
+
     def __init__(self):
         self.classifier = Llama4ForConditionalGeneration.from_pretrained(
             "meta-llama/Llama-Guard-4-12B",
             torch_dtype=torch.bfloat16,
-            device_map="auto"
+            device_map="auto",
         )
         self.tokenizer = AutoProcessor.from_pretrained(
             "meta-llama/Llama-Guard-4-12B",
             use_fast=True,
             truncation_side="right",
-            padding_side="left"
+            padding_side="left",
         )
-        self.tokenizer.model_max_length = 2 ** 20
+        self.tokenizer.model_max_length = 2**20
         self.tokenizer.pad_token_id = 0
 
         self.unsafe_token_id = 72110
@@ -50,15 +51,18 @@ class LlamaGuard4Judge(FineTunedJudge):
                     message["content"] = [{"type": "text", "text": message["content"]}]
 
         # Llama Guard expects the *full* chat history
-        inputs = self.tokenizer.apply_chat_template(
-            chats,
-            tokenize=False
-        )
+        inputs = self.tokenizer.apply_chat_template(chats, tokenize=False)
         input_ids = self.tokenize_sequences(self.tokenizer, inputs).input_ids
 
         # Append newline token since its always the first to be predicted anyways
         newline_token_id = 368
-        input_ids = torch.cat((input_ids, torch.full((input_ids.size(0), 1), newline_token_id, dtype=torch.long)), dim=1)
+        input_ids = torch.cat(
+            (
+                input_ids,
+                torch.full((input_ids.size(0), 1), newline_token_id, dtype=torch.long),
+            ),
+            dim=1,
+        )
 
         generation = self.classifier.generate(
             input_ids=input_ids.to(self.classifier.device),
@@ -67,7 +71,7 @@ class LlamaGuard4Judge(FineTunedJudge):
             use_cache=False,
             return_dict_in_generate=True,
             output_scores=True,
-            pad_token_id=self.tokenizer.pad_token_id
+            pad_token_id=self.tokenizer.pad_token_id,
         )
         # The relevant score is the first one after the forced newline
         scores = generation.scores[0].softmax(dim=-1)
@@ -76,6 +80,8 @@ class LlamaGuard4Judge(FineTunedJudge):
         safe_prob = scores[:, self.safe_token_id]
 
         if (unsafe_prob + safe_prob - 1.0).abs().max() > 0.1:
-            logging.warning(f"Llama Guard 4 probabilities don't add up to 1.0: unsafe={unsafe_prob}, safe={safe_prob}")
+            logging.warning(
+                f"Llama Guard 4 probabilities don't add up to 1.0: unsafe={unsafe_prob}, safe={safe_prob}"
+            )
 
         return {"p_harmful": unsafe_prob.cpu().tolist()}

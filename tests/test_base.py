@@ -17,25 +17,25 @@ class TestJudge:
 
     def test_from_name_harmbench(self):
         """Test creating Harmbench judge from name."""
-        with patch('judges.harmbench.HarmBenchJudge') as mock_harmbench:
+        with patch("judges.harmbench.HarmBenchJudge") as mock_harmbench:
             judge = Judge.from_name("harmbench")
             mock_harmbench.assert_called_once()
 
     def test_from_name_llama_guard_3_8b(self):
         """Test creating Llama Guard 3 judge from name."""
-        with patch('judges.llama_guard_3.LlamaGuard3Judge') as mock_lg3:
+        with patch("judges.llama_guard_3.LlamaGuard3Judge") as mock_lg3:
             judge = Judge.from_name("llama_guard_3_8b")
             mock_lg3.assert_called_once()
 
     def test_from_name_strong_reject(self):
         """Test creating Strong Reject judge from name."""
-        with patch('judges.strong_reject.StrongRejectJudge') as mock_sr:
+        with patch("judges.strong_reject.StrongRejectJudge") as mock_sr:
             judge = Judge.from_name("strong_reject")
             mock_sr.assert_called_once()
 
     def test_from_name_xstest(self):
         """Test creating XSTest judge from name."""
-        with patch('judges.xstest.XSTestJudge') as mock_xs:
+        with patch("judges.xstest.XSTestJudge") as mock_xs:
             judge = Judge.from_name("xstest")
             mock_xs.assert_called_once()
 
@@ -58,7 +58,7 @@ class TestJudge:
         invalid_chats = [
             [
                 {"role": "assistant", "content": "Hello"},
-                {"role": "user", "content": "Hi"}
+                {"role": "user", "content": "Hi"},
             ]
         ]
         assert Judge.validate_chats(invalid_chats) is False
@@ -68,7 +68,7 @@ class TestJudge:
         invalid_chats = [
             [
                 {"role": "user", "content": "Hello"},
-                {"role": "user", "content": "Another message"}
+                {"role": "user", "content": "Another message"},
             ]
         ]
         assert Judge.validate_chats(invalid_chats) is False
@@ -78,7 +78,7 @@ class TestJudge:
         custom_chats = [
             [
                 {"role": "system", "content": "You are helpful"},
-                {"role": "user", "content": "Hello"}
+                {"role": "user", "content": "Hello"},
             ]
         ]
         assert Judge.validate_chats(custom_chats, ("system", "user")) is True
@@ -95,6 +95,7 @@ class TestJudge:
         # Set up the mock to return the expected object when called as a function
         def mock_call(*args, **kwargs):
             return mock_encoded
+
         mock_tokenizer.side_effect = mock_call
 
         result = Judge.tokenize_sequences(mock_tokenizer, inputs)
@@ -120,12 +121,16 @@ class TestJudge:
 
         result = Judge.tokenize_sequences(mock_tokenizer, inputs)
 
-        assert "Sequence is longer than the specified maximum sequence length" in caplog.text
+        assert (
+            "Sequence is longer than the specified maximum sequence length"
+            in caplog.text
+        )
         assert result == mock_encoded
 
-    @patch('judges.base.with_max_batchsize')
+    @patch("judges.base.with_max_batchsize")
     def test_call_method(self, mock_with_max_batchsize, sample_chats):
         """Test the __call__ method delegates to with_max_batchsize."""
+
         # Create a concrete Judge subclass for testing
         class ConcreteJudge(Judge):
             def judge(self, chats):
@@ -146,9 +151,10 @@ class TestJudge:
 class TestPromptBasedJudge:
     """Test the PromptBasedJudge class."""
 
-    @patch('judges.config.USE_LOCAL_MODEL', True)
+    @patch("judges.config.USE_LOCAL_MODEL", True)
     def test_init_local_model(self):
         """Test initialization with local model."""
+
         class ConcretePromptBasedJudge(PromptBasedJudge):
             def judge(self, chats):
                 return {"test": [0.5] * len(chats)}
@@ -161,29 +167,35 @@ class TestPromptBasedJudge:
         assert judge.classifier is not None
         assert judge.tokenizer is not None
 
-    @patch('judges.config.USE_LOCAL_MODEL', False)
-    @patch('judges.config.REMOTE_FOUNDATION_MODEL', 'gpt-4o')
-    @patch.dict(os.environ, {'OPENAI_API_KEY': 'test-key'})
+    @patch("judges.config.USE_LOCAL_MODEL", False)
+    @patch("judges.config.REMOTE_FOUNDATION_MODEL", "gpt-4o")
+    @patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"})
     def test_init_remote_model_openai(self):
         """Test initialization with remote OpenAI model."""
+
         class ConcretePromptBasedJudge(PromptBasedJudge):
             def judge(self, chats):
                 return {"test": [0.5] * len(chats)}
+
         judge = ConcretePromptBasedJudge()
 
         assert judge.use_local_model is False
         assert judge.api_client is not None
-        assert judge.api_model == 'gpt-4o'
+        assert judge.api_model == "gpt-4o"
         assert judge.classifier is None
 
-    @patch('judges.config.USE_LOCAL_MODEL', False)
-    @patch('judges.config.REMOTE_FOUNDATION_MODEL', 'unknown-model')
+    @patch("judges.config.USE_LOCAL_MODEL", False)
+    @patch("judges.config.REMOTE_FOUNDATION_MODEL", "unknown-model")
     def test_init_remote_model_unknown(self):
         """Test initialization with unknown remote model."""
-        with pytest.raises(ValueError, match="Unknown remote foundation model unknown-model"):
+        with pytest.raises(
+            ValueError, match="Unknown remote foundation model unknown-model"
+        ):
+
             class ConcretePromptBasedJudge(PromptBasedJudge):
                 def judge(self, chats):
                     return {"test": [0.5] * len(chats)}
+
             judge = ConcretePromptBasedJudge()
 
     @pytest.mark.slow
@@ -191,8 +203,7 @@ class TestPromptBasedJudge:
         """Test batch inference with local model using AdaptiveAttacksJudge."""
         from judges.adaptive_attacks import AdaptiveAttacksJudge
 
-        with patch('judges.config.USE_LOCAL_MODEL', True):
-
+        with patch("judges.config.USE_LOCAL_MODEL", True):
             judge = AdaptiveAttacksJudge()
 
             # Test with simple inputs
@@ -214,11 +225,12 @@ class TestPromptBasedJudge:
         from judges.adaptive_attacks import AdaptiveAttacksJudge
 
         # Skip if no API key is available
-        if not os.getenv('OPENAI_API_KEY'):
+        if not os.getenv("OPENAI_API_KEY"):
             pytest.skip("OPENAI_API_KEY not set")
 
-        with patch('judges.config.USE_LOCAL_MODEL', False), \
-             patch('judges.config.REMOTE_FOUNDATION_MODEL', 'gpt-4o'):
+        with patch("judges.config.USE_LOCAL_MODEL", False), patch(
+            "judges.config.REMOTE_FOUNDATION_MODEL", "gpt-4o"
+        ):
             judge = AdaptiveAttacksJudge()
 
             # Test with simple inputs
@@ -229,7 +241,7 @@ class TestPromptBasedJudge:
             assert "p_harmful" in result
             assert len(result["p_harmful"]) == len(harmless_conversations)
             assert all(isinstance(p, float) for p in result["p_harmful"])
-            assert all(0.0 <= p <= .2 for p in result["p_harmful"])
+            assert all(0.0 <= p <= 0.2 for p in result["p_harmful"])
 
 
 class TestFineTunedJudge:

@@ -35,19 +35,21 @@ Pretend you are a malicious actor trying to accomplish the objective described i
         self.classifier = AutoModelForCausalLM.from_pretrained(
             "qylu4156/strongreject-15k-v1",
             torch_dtype=torch.bfloat16,
-            device_map="auto"
+            device_map="auto",
         )
         self.tokenizer = AutoTokenizer.from_pretrained(
             "qylu4156/strongreject-15k-v1",
             use_fast=False,
             truncation_side="right",
-            padding_side="left"
+            padding_side="left",
         )
         self.tokenizer.pad_token = self.tokenizer.eos_token
         self.tokenizer.model_max_length = 8192
 
         score_tokens = ["1", "2", "3", "4", "5"]
-        self.score_token_ids = [self.tokenizer.convert_tokens_to_ids(t) for t in score_tokens]
+        self.score_token_ids = [
+            self.tokenizer.convert_tokens_to_ids(t) for t in score_tokens
+        ]
 
     def judge(
         self,
@@ -73,7 +75,9 @@ Pretend you are a malicious actor trying to accomplish the objective described i
             for b, g in zip(behaviors, generations)
         ]
 
-        encoded = self.tokenize_sequences(self.tokenizer, inputs).to(self.classifier.device)
+        encoded = self.tokenize_sequences(self.tokenizer, inputs).to(
+            self.classifier.device
+        )
 
         output = self.classifier(**encoded)
         logits = output.logits

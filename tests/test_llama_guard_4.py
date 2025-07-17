@@ -33,8 +33,8 @@ class TestLlamaGuard4Judge:
 
         # Verify the judge was created successfully
         assert judge is not None
-        assert hasattr(judge, 'classifier')
-        assert hasattr(judge, 'tokenizer')
+        assert hasattr(judge, "classifier")
+        assert hasattr(judge, "tokenizer")
 
         # Verify token IDs are set correctly
         assert judge.unsafe_token_id == 72110
@@ -79,7 +79,9 @@ class TestLlamaGuard4Judge:
         # We don't assert a specific threshold since model outputs can vary
 
     @pytest.mark.slow
-    def test_judge_potentially_harmful_conversation(self, llama_guard_judge, harmful_conversations):
+    def test_judge_potentially_harmful_conversation(
+        self, llama_guard_judge, harmful_conversations
+    ):
         """Test judge with a potentially harmful conversation."""
         judge = llama_guard_judge
 
@@ -93,7 +95,9 @@ class TestLlamaGuard4Judge:
         assert all(0.5 <= p <= 1.0 for p in result["p_harmful"])
 
     @pytest.mark.slow
-    def test_judge_multiple_chats_harmless(self, llama_guard_judge, harmless_conversations):
+    def test_judge_multiple_chats_harmless(
+        self, llama_guard_judge, harmless_conversations
+    ):
         """Test judge with multiple different chats."""
         judge = llama_guard_judge
 
@@ -103,10 +107,12 @@ class TestLlamaGuard4Judge:
         assert "p_harmful" in result
         assert len(result["p_harmful"]) == len(harmless_conversations)
         assert all(isinstance(p, float) for p in result["p_harmful"])
-        assert all(0.0 <= p <= .1 for p in result["p_harmful"])
+        assert all(0.0 <= p <= 0.1 for p in result["p_harmful"])
 
     @pytest.mark.slow
-    def test_judge_multiple_chats_harmless_batched(self, llama_guard_judge, harmless_conversations):
+    def test_judge_multiple_chats_harmless_batched(
+        self, llama_guard_judge, harmless_conversations
+    ):
         """Test judge with multiple different chats."""
         judge = llama_guard_judge
 
@@ -116,10 +122,12 @@ class TestLlamaGuard4Judge:
         assert "p_harmful" in result
         assert len(result["p_harmful"]) == len(harmless_conversations)
         assert all(isinstance(p, float) for p in result["p_harmful"])
-        assert all(0.0 <= p <= .1 for p in result["p_harmful"])
+        assert all(0.0 <= p <= 0.1 for p in result["p_harmful"])
 
     @pytest.mark.slow
-    def test_judge_multiple_chats_harmful(self, llama_guard_judge, harmful_conversations, harmless_conversations):
+    def test_judge_multiple_chats_harmful(
+        self, llama_guard_judge, harmful_conversations, harmless_conversations
+    ):
         """Test judge with multiple different chats."""
         judge = llama_guard_judge
 
@@ -128,15 +136,17 @@ class TestLlamaGuard4Judge:
 
         assert isinstance(result, dict)
         assert "p_harmful" in result
-        assert len(result["p_harmful"]) == len(harmful_conversations) + len(harmless_conversations)
+        assert len(result["p_harmful"]) == len(harmful_conversations) + len(
+            harmless_conversations
+        )
         assert all(isinstance(p, float) for p in result["p_harmful"])
 
         # Check harmful conversations (first part of results)
-        harmful_probs = result["p_harmful"][:len(harmful_conversations)]
+        harmful_probs = result["p_harmful"][: len(harmful_conversations)]
         assert all(0.5 <= p <= 1.0 for p in harmful_probs)
 
         # Check harmless conversations (second part of results)
-        harmless_probs = result["p_harmful"][len(harmful_conversations):]
+        harmless_probs = result["p_harmful"][len(harmful_conversations) :]
         assert all(0.0 <= p <= 0.1 for p in harmless_probs)
 
     def test_judge_empty_chats(self, llama_guard_judge):
@@ -156,7 +166,7 @@ class TestLlamaGuard4Judge:
 
         # Check that the model is on some device
         model_device = next(judge.classifier.parameters()).device
-        assert model_device.type in ['cuda', 'cpu']
+        assert model_device.type in ["cuda", "cpu"]
 
     def test_inheritance(self, llama_guard_judge):
         """Test that LlamaGuard4Judge properly inherits from FineTunedJudge."""
@@ -173,7 +183,10 @@ class TestLlamaGuard4Judge:
         chat = [
             [
                 {"role": "user", "content": "Tell me a joke."},
-                {"role": "assistant", "content": "Why don't scientists trust atoms? Because they make up everything!"}
+                {
+                    "role": "assistant",
+                    "content": "Why don't scientists trust atoms? Because they make up everything!",
+                },
             ]
         ]
 
@@ -192,7 +205,7 @@ class TestLlamaGuard4Judge:
         chat = [
             [
                 {"role": "user", "content": "Hello"},
-                {"role": "assistant", "content": "Hi there!"}
+                {"role": "assistant", "content": "Hi there!"},
             ]
         ]
 
@@ -214,7 +227,7 @@ class TestLlamaGuard4Judge:
         chat_string_content = [
             [
                 {"role": "user", "content": "Hello"},
-                {"role": "assistant", "content": "Hi there!"}
+                {"role": "assistant", "content": "Hi there!"},
             ]
         ]
 
@@ -222,7 +235,10 @@ class TestLlamaGuard4Judge:
         chat_multimodal_content = [
             [
                 {"role": "user", "content": [{"type": "text", "text": "Hello"}]},
-                {"role": "assistant", "content": [{"type": "text", "text": "Hi there!"}]}
+                {
+                    "role": "assistant",
+                    "content": [{"type": "text", "text": "Hi there!"}],
+                },
             ]
         ]
 
@@ -244,7 +260,11 @@ class TestLlamaGuard4Judge:
 
         # Verify that we're using AutoProcessor (not AutoTokenizer like LlamaGuard3)
         from transformers import AutoProcessor
-        assert isinstance(judge.tokenizer, type(AutoProcessor.from_pretrained("meta-llama/Llama-Guard-4-12B")))
+
+        assert isinstance(
+            judge.tokenizer,
+            type(AutoProcessor.from_pretrained("meta-llama/Llama-Guard-4-12B")),
+        )
 
         # Verify processor settings
         assert judge.tokenizer.pad_token_id == 0
@@ -266,7 +286,7 @@ class TestLlamaGuard4Judge:
         chat = [
             [
                 {"role": "user", "content": "Hello"},
-                {"role": "assistant", "content": "Hi there!"}
+                {"role": "assistant", "content": "Hi there!"},
             ]
         ]
 

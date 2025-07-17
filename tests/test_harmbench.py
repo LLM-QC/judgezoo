@@ -33,8 +33,8 @@ class TestHarmbenchJudge:
 
         # Verify the judge was created successfully
         assert judge is not None
-        assert hasattr(judge, 'classifier')
-        assert hasattr(judge, 'tokenizer')
+        assert hasattr(judge, "classifier")
+        assert hasattr(judge, "tokenizer")
 
         # Verify token IDs are set correctly
         assert judge.yes_token_id == 8241
@@ -77,7 +77,9 @@ class TestHarmbenchJudge:
         assert all(0.0 <= p <= 0.2 for p in result["p_harmful"])
 
     @pytest.mark.slow
-    def test_judge_potentially_harmful_conversation(self, harmbench_judge, harmful_conversations):
+    def test_judge_potentially_harmful_conversation(
+        self, harmbench_judge, harmful_conversations
+    ):
         """Test judge with a potentially harmful conversation."""
         judge = harmbench_judge
 
@@ -91,7 +93,9 @@ class TestHarmbenchJudge:
         assert all(0.5 <= p <= 1.0 for p in result["p_harmful"])
 
     @pytest.mark.slow
-    def test_judge_multiple_chats_harmless(self, harmbench_judge, harmless_conversations):
+    def test_judge_multiple_chats_harmless(
+        self, harmbench_judge, harmless_conversations
+    ):
         """Test judge with multiple harmless chats."""
         judge = harmbench_judge
 
@@ -101,10 +105,12 @@ class TestHarmbenchJudge:
         assert "p_harmful" in result
         assert len(result["p_harmful"]) == len(harmless_conversations)
         assert all(isinstance(p, float) for p in result["p_harmful"])
-        assert all(0.0 <= p <= .2 for p in result["p_harmful"])
+        assert all(0.0 <= p <= 0.2 for p in result["p_harmful"])
 
     @pytest.mark.slow
-    def test_judge_multiple_chats_harmless_batched(self, harmbench_judge, harmless_conversations):
+    def test_judge_multiple_chats_harmless_batched(
+        self, harmbench_judge, harmless_conversations
+    ):
         """Test judge with multiple harmless chats using callable interface."""
         judge = harmbench_judge
 
@@ -114,10 +120,12 @@ class TestHarmbenchJudge:
         assert "p_harmful" in result
         assert len(result["p_harmful"]) == len(harmless_conversations)
         assert all(isinstance(p, float) for p in result["p_harmful"])
-        assert all(0.0 <= p <= .2 for p in result["p_harmful"])
+        assert all(0.0 <= p <= 0.2 for p in result["p_harmful"])
 
     @pytest.mark.slow
-    def test_judge_multiple_chats_harmful(self, harmbench_judge, harmful_conversations, harmless_conversations):
+    def test_judge_multiple_chats_harmful(
+        self, harmbench_judge, harmful_conversations, harmless_conversations
+    ):
         """Test judge with mixed harmful and safe chats."""
         judge = harmbench_judge
 
@@ -126,15 +134,17 @@ class TestHarmbenchJudge:
 
         assert isinstance(result, dict)
         assert "p_harmful" in result
-        assert len(result["p_harmful"]) == len(harmful_conversations) + len(harmless_conversations)
+        assert len(result["p_harmful"]) == len(harmful_conversations) + len(
+            harmless_conversations
+        )
         assert all(isinstance(p, float) for p in result["p_harmful"])
 
         # Check harmful conversations (first part of results)
-        harmful_probs = result["p_harmful"][:len(harmful_conversations)]
+        harmful_probs = result["p_harmful"][: len(harmful_conversations)]
         assert all(0.5 <= p <= 1.0 for p in harmful_probs)
 
         # Check harmless conversations (second part of results)
-        harmless_probs = result["p_harmful"][len(harmful_conversations):]
+        harmless_probs = result["p_harmful"][len(harmful_conversations) :]
         assert all(0.0 <= p <= 0.2 for p in harmless_probs)
 
     def test_judge_empty_chats(self, harmbench_judge):
@@ -154,7 +164,7 @@ class TestHarmbenchJudge:
 
         # Check that the model is on some device
         model_device = next(judge.classifier.parameters()).device
-        assert model_device.type in ['cuda', 'cpu']
+        assert model_device.type in ["cuda", "cpu"]
 
     def test_inheritance(self, harmbench_judge):
         """Test that HarmBenchJudge properly inherits from FineTunedJudge."""
@@ -171,7 +181,10 @@ class TestHarmbenchJudge:
         chat = [
             [
                 {"role": "user", "content": "Tell me a joke."},
-                {"role": "assistant", "content": "Why don't scientists trust atoms? Because they make up everything!"}
+                {
+                    "role": "assistant",
+                    "content": "Why don't scientists trust atoms? Because they make up everything!",
+                },
             ]
         ]
 
@@ -190,7 +203,7 @@ class TestHarmbenchJudge:
         chat = [
             [
                 {"role": "user", "content": "Hello"},
-                {"role": "assistant", "content": "Hi there!"}
+                {"role": "assistant", "content": "Hi there!"},
             ]
         ]
 
@@ -221,7 +234,7 @@ class TestHarmbenchJudge:
         test_chat = [
             [
                 {"role": "user", "content": "Test behavior"},
-                {"role": "assistant", "content": "Test generation"}
+                {"role": "assistant", "content": "Test generation"},
             ]
         ]
 

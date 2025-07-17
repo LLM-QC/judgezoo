@@ -21,6 +21,7 @@ def adaptive_attacks_judge():
     judge = AdaptiveAttacksJudge()
     return judge
 
+
 @pytest.fixture(scope="session")
 def adaptive_attacks_judge_local():
     """Create an AdaptiveAttacksJudge instance for testing.
@@ -30,6 +31,7 @@ def adaptive_attacks_judge_local():
     """
     judge = AdaptiveAttacksJudge(use_local_model=True)
     return judge
+
 
 class TestAdaptiveAttacksJudge:
     """Test the Adaptive Attacks Judge implementation."""
@@ -41,8 +43,8 @@ class TestAdaptiveAttacksJudge:
 
         # Verify the judge was created successfully
         assert judge is not None
-        assert hasattr(judge, 'JUDGE_PROMPT')
-        assert hasattr(judge, 'CLASSIFICATION_PATTERN')
+        assert hasattr(judge, "JUDGE_PROMPT")
+        assert hasattr(judge, "CLASSIFICATION_PATTERN")
 
         # Verify the prompt contains expected elements
         assert "red teaming assistant" in judge.JUDGE_PROMPT
@@ -54,8 +56,8 @@ class TestAdaptiveAttacksJudge:
         """Test AdaptiveAttacksJudge initialization with local model."""
         judge = adaptive_attacks_judge_local
         assert judge is not None
-        assert hasattr(judge, 'JUDGE_PROMPT')
-        assert hasattr(judge, 'CLASSIFICATION_PATTERN')
+        assert hasattr(judge, "JUDGE_PROMPT")
+        assert hasattr(judge, "CLASSIFICATION_PATTERN")
 
     @pytest.mark.slow
     def test_judge_valid_chats(self, adaptive_attacks_judge, sample_chats):
@@ -88,7 +90,9 @@ class TestAdaptiveAttacksJudge:
         assert result == [None] * len(invalid_chats)
 
     @pytest.mark.slow
-    def test_judge_safe_conversation(self, adaptive_attacks_judge, harmless_conversations):
+    def test_judge_safe_conversation(
+        self, adaptive_attacks_judge, harmless_conversations
+    ):
         """Test judge with a clearly safe conversation."""
         judge = adaptive_attacks_judge
 
@@ -103,10 +107,14 @@ class TestAdaptiveAttacksJudge:
         # For a clearly safe conversation, we expect low rating and p_harmful
         if all(r is not None for r in result["rating"]):
             assert all(r <= 3 for r in result["rating"])  # Should be low rating
-            assert all(0.0 <= p <= 0.3 for p in result["p_harmful"])  # Should be low p_harmful
+            assert all(
+                0.0 <= p <= 0.3 for p in result["p_harmful"]
+            )  # Should be low p_harmful
 
     @pytest.mark.slow
-    def test_judge_potentially_harmful_conversation(self, adaptive_attacks_judge, harmful_conversations):
+    def test_judge_potentially_harmful_conversation(
+        self, adaptive_attacks_judge, harmful_conversations
+    ):
         """Test judge with a potentially harmful conversation."""
         judge = adaptive_attacks_judge
 
@@ -125,7 +133,9 @@ class TestAdaptiveAttacksJudge:
             assert all(0.3 <= p <= 1.0 for p in result["p_harmful"])
 
     @pytest.mark.slow
-    def test_judge_multiple_chats_harmless(self, adaptive_attacks_judge, harmless_conversations):
+    def test_judge_multiple_chats_harmless(
+        self, adaptive_attacks_judge, harmless_conversations
+    ):
         """Test judge with multiple harmless chats."""
         judge = adaptive_attacks_judge
 
@@ -144,7 +154,9 @@ class TestAdaptiveAttacksJudge:
                 assert 0.0 <= p <= 0.3
 
     @pytest.mark.slow
-    def test_judge_multiple_chats_harmless_batched(self, adaptive_attacks_judge, harmless_conversations):
+    def test_judge_multiple_chats_harmless_batched(
+        self, adaptive_attacks_judge, harmless_conversations
+    ):
         """Test judge with multiple harmless chats using callable interface."""
         judge = adaptive_attacks_judge
 
@@ -157,7 +169,9 @@ class TestAdaptiveAttacksJudge:
         assert len(result["rating"]) == len(harmless_conversations)
 
     @pytest.mark.slow
-    def test_judge_multiple_chats_harmful(self, adaptive_attacks_judge, harmful_conversations, harmless_conversations):
+    def test_judge_multiple_chats_harmful(
+        self, adaptive_attacks_judge, harmful_conversations, harmless_conversations
+    ):
         """Test judge with mixed harmful and safe chats."""
         judge = adaptive_attacks_judge
 
@@ -166,13 +180,17 @@ class TestAdaptiveAttacksJudge:
         assert isinstance(result, dict)
         assert "p_harmful" in result
         assert "rating" in result
-        assert len(result["p_harmful"]) == len(harmful_conversations) + len(harmless_conversations)
-        assert len(result["rating"]) == len(harmful_conversations) + len(harmless_conversations)
+        assert len(result["p_harmful"]) == len(harmful_conversations) + len(
+            harmless_conversations
+        )
+        assert len(result["rating"]) == len(harmful_conversations) + len(
+            harmless_conversations
+        )
 
-        harmful_ratings = result["rating"][:len(harmful_conversations)]
-        harmless_ratings = result["rating"][len(harmful_conversations):]
-        harmful_probs = result["p_harmful"][:len(harmful_conversations)]
-        harmless_probs = result["p_harmful"][len(harmful_conversations):]
+        harmful_ratings = result["rating"][: len(harmful_conversations)]
+        harmless_ratings = result["rating"][len(harmful_conversations) :]
+        harmful_probs = result["p_harmful"][: len(harmful_conversations)]
+        harmless_probs = result["p_harmful"][len(harmful_conversations) :]
         assert all(r >= 6 for r in harmful_ratings)
         assert all(r <= 3 for r in harmless_ratings)
         assert all(0.5 <= p <= 1.0 for p in harmful_probs)
@@ -205,7 +223,10 @@ class TestAdaptiveAttacksJudge:
         chat = [
             [
                 {"role": "user", "content": "Tell me a joke."},
-                {"role": "assistant", "content": "Why don't scientists trust atoms? Because they make up everything!"}
+                {
+                    "role": "assistant",
+                    "content": "Why don't scientists trust atoms? Because they make up everything!",
+                },
             ]
         ]
 
@@ -255,7 +276,7 @@ class TestAdaptiveAttacksJudge:
         test_chat = [
             [
                 {"role": "user", "content": "Test task"},
-                {"role": "assistant", "content": "Test response"}
+                {"role": "assistant", "content": "Test response"},
             ]
         ]
 
@@ -275,7 +296,7 @@ class TestAdaptiveAttacksJudge:
 
         # Test the conversion formula: (rating - 1) / 9
         test_ratings = [1, 5, 10]
-        expected_probs = [0.0, 4/9, 1.0]
+        expected_probs = [0.0, 4 / 9, 1.0]
 
         for rating, expected_prob in zip(test_ratings, expected_probs):
             # Mock a result with a specific rating
@@ -291,7 +312,7 @@ class TestAdaptiveAttacksJudge:
         test_chat = [
             [
                 {"role": "user", "content": "Simple question"},
-                {"role": "assistant", "content": "Simple answer"}
+                {"role": "assistant", "content": "Simple answer"},
             ]
         ]
 
