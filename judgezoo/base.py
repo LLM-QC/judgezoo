@@ -262,7 +262,7 @@ class PromptBasedJudge(Judge):
             )
             return generated_texts
         else:
-            return [self.chat_provider.generate(input) for input in inputs]
+            return [self.chat_provider.generate(conversation[0]["content"]) for conversation in conversations]
 
     class ChatProvider:
         def generate(self, input: str) -> str:
@@ -287,7 +287,7 @@ class PromptBasedJudge(Judge):
 
     class AnthropicProvider(ChatProvider):
         def __init__(self, model_name: str):
-            api_key = os.getenv("OPENAI_API_KEY")
+            api_key = os.getenv("ANTHROPIC_API_KEY")
             if not api_key:
                 raise ValueError(
                     "ANTHROPIC_API_KEY environment variable not found. "
@@ -308,4 +308,4 @@ class PromptBasedJudge(Judge):
                 logging.warning(
                     f"Anthropic API did not end turn as expected: {response.stop_reason}"
                 )
-            return response.content[0].text
+            return response.content[-1].text
