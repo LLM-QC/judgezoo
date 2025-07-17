@@ -186,12 +186,12 @@ class PromptBasedJudge(Judge):
         self.use_local_model = (
             use_local_model if use_local_model is not None else USE_LOCAL_MODEL
         )
-        local_foundation_model = (
+        self.local_foundation_model = (
             local_foundation_model
             if local_foundation_model is not None
             else LOCAL_FOUNDATION_MODEL
         )
-        remote_foundation_model = (
+        self.remote_foundation_model = (
             remote_foundation_model
             if remote_foundation_model is not None
             else REMOTE_FOUNDATION_MODEL
@@ -200,12 +200,12 @@ class PromptBasedJudge(Judge):
         if self.use_local_model:
             self.chat_provider = None
             self.classifier = AutoModelForCausalLM.from_pretrained(
-                local_foundation_model,
+                self.local_foundation_model,
                 torch_dtype=torch.bfloat16,
                 device_map="auto",
             )
             self.tokenizer = AutoTokenizer.from_pretrained(
-                local_foundation_model,
+                self.local_foundation_model,
                 use_fast=False,
                 truncation_side="right",
                 padding_side="left",
@@ -215,13 +215,13 @@ class PromptBasedJudge(Judge):
         else:
             self.classifier = None
             self.tokenizer = None
-            if "gpt" in remote_foundation_model:
+            if "gpt" in self.remote_foundation_model:
                 self.chat_provider = self.OpenAIProvider(
-                    model_name=remote_foundation_model
+                    model_name=self.remote_foundation_model
                 )
-            elif "claude" in remote_foundation_model:
+            elif "claude" in self.remote_foundation_model:
                 self.chat_provider = self.AnthropicProvider(
-                    model_name=remote_foundation_model
+                    model_name=self.remote_foundation_model
                 )
             else:
                 raise ValueError(
