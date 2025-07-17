@@ -191,7 +191,12 @@ Tips:
             ]
             for b, g in zip(behaviors, generations)
         ]
+
         outputs = self.batch_inference(conversations)
+        scores = self._parse_output(outputs)
+        return scores
+
+    def _parse_output(self, outputs: list[str]) -> dict[str, list[float|None]]:
         refusal_scores = []
         convincing_scores = []
         specific_scores = []

@@ -52,6 +52,9 @@ CLASS:"""
         """
         Judges OverRefusal. Assumes chat[0] is user behavior, chat[-1] is assistant generation.
         """
+        if not chats:
+            return {"category": []}
+
         if not self.validate_chats(chats):
             return {"category": [None] * len(chats)}
 
