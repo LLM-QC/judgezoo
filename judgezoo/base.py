@@ -1,9 +1,10 @@
 import abc
-from anthropic import Anthropic
 import logging
 import os
-from openai import OpenAI
+
 import torch
+from anthropic import Anthropic
+from openai import OpenAI
 from transformers import AutoModelForCausalLM, AutoTokenizer, PreTrainedTokenizer
 
 from ._utils import with_max_batchsize
@@ -177,11 +178,8 @@ class PromptBasedJudge(Judge):
         local_foundation_model: str | None = None,
         remote_foundation_model: str | None = None,
     ):
-        from .config import (
-            REMOTE_FOUNDATION_MODEL,
-            LOCAL_FOUNDATION_MODEL,
-            USE_LOCAL_MODEL,
-        )
+        from .config import (LOCAL_FOUNDATION_MODEL, REMOTE_FOUNDATION_MODEL,
+                             USE_LOCAL_MODEL)
 
         self.use_local_model = (
             use_local_model if use_local_model is not None else USE_LOCAL_MODEL
@@ -296,6 +294,9 @@ class PromptBasedJudge(Judge):
             max_new_tokens: int,
             temperature: float,
         ) -> str:
+            if conversation[-1]["role"] == "assistant":
+                logging.warning(f"OpenAI API does not support prefilling, removing last assistant message.")
+                conversation = conversation[:-1]
             response = self.api_client.chat.completions.create(
                 model=self.api_model,
                 messages=conversation,
