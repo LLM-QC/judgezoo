@@ -8,6 +8,7 @@
 }
 
 """
+
 import logging
 
 from .base import PromptBasedJudge
@@ -31,17 +32,27 @@ Assistant's answer.
 [The Start of Assistant's Answer]
 {answer}
 [The End of Assistant's Answer]"""
+
     def __init__(
         self,
         use_local_model: bool | None = None,
         local_foundation_model: str | None = None,
         remote_foundation_model: str | None = None,
     ):
-        super().__init__(use_local_model, local_foundation_model, remote_foundation_model)
-        if self.use_local_model:
-            logging.warning(f"IntentionAnalysisJudge originally used gpt-3.5-turbo-0613, you are using {local_foundation_model}. Results may differ from the original paper.")
-        elif not self.use_local_model and remote_foundation_model != "gpt-3.5-turbo-0613":
-            logging.warning(f"IntentionAnalysisJudge originally used gpt-3.5-turbo-0613, you are using {remote_foundation_model}. Results may differ from the original paper.")
+        super().__init__(
+            use_local_model, local_foundation_model, remote_foundation_model
+        )
+        if self.use_local_model and self.local_foundation_model != "gpt-3.5-turbo-0613":
+            logging.warning(
+                f"IntentionAnalysisJudge originally used gpt-3.5-turbo-0613, you are using {self.local_foundation_model}. Results may differ from the original paper."
+            )
+        elif (
+            not self.use_local_model
+            and self.remote_foundation_model != "gpt-3.5-turbo-0613"
+        ):
+            logging.warning(
+                f"IntentionAnalysisJudge originally used gpt-3.5-turbo-0613, , you are using {self.remote_foundation_model}. Results may differ from the original paper."
+            )
 
         self.score_map = {
             "A": 1.0,
@@ -65,7 +76,12 @@ Assistant's answer.
         answers = [c[-1]["content"] for c in chats]
 
         conversations = [
-            [{"role": "user", "content": self.JUDGE_PROMPT.format(question=q, answer=a)}]
+            [
+                {
+                    "role": "user",
+                    "content": self.JUDGE_PROMPT.format(question=q, answer=a),
+                }
+            ]
             for q, a in zip(questions, answers)
         ]
 
