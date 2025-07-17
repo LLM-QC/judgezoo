@@ -230,7 +230,7 @@ class PromptBasedJudge(Judge):
                 )
 
     def batch_inference(
-        self, conversations: list[list[dict[str, str]]], max_new_tokens: int = 128
+        self, conversations: list[list[dict[str, str]]], max_new_tokens: int = 512
     ) -> list[str]:
         """
         Batch inference for prompt-based judges.
