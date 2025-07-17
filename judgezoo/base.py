@@ -261,7 +261,10 @@ class PromptBasedJudge(Judge):
             )
             return generated_texts
         else:
-            return [self.chat_provider.generate(conversation[0]["content"]) for conversation in conversations]
+            return [
+                self.chat_provider.generate(conversation, max_new_tokens=max_new_tokens)
+                for conversation in conversations
+            ]
 
     class ChatProvider:
         def generate(self, input: str) -> str:
@@ -278,9 +281,13 @@ class PromptBasedJudge(Judge):
             self.api_client = OpenAI(api_key=api_key)
             self.api_model = model_name
 
-        def generate(self, input: str) -> str:
+        def generate(
+            self, conversation: list[dict:[str, str]], max_new_tokens: int
+        ) -> str:
             response = self.api_client.chat.completions.create(
-                model=self.api_model, messages=[{"role": "user", "content": input}]
+                model=self.api_model,
+                messages=conversation,
+                max_tokens=max_new_tokens,
             )
             return response.choices[0].message.content
 
@@ -295,13 +302,13 @@ class PromptBasedJudge(Judge):
             self.api_client = Anthropic(api_key=api_key)
             self.api_model = model_name
 
-        def generate(self, input: str) -> str:
+        def generate(
+            self, conversation: list[dict:[str, str]], max_new_tokens: int
+        ) -> str:
             response = self.api_client.messages.create(
                 model=self.api_model,
-                max_tokens=1024,
-                messages=[
-                    {"role": "user", "content": input},
-                ],
+                max_tokens=max_new_tokens,
+                messages=conversation,
             )
             if response.stop_reason != "end_turn":
                 logging.warning(
