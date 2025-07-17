@@ -1,13 +1,11 @@
 import abc
 import logging
 import os
-from openai import OpenAI
-from anthropic import Anthropic
 
 import torch
+from transformers import PreTrainedTokenizer, AutoModelForCausalLM, AutoTokenizer
 from openai import OpenAI
-from transformers import AutoModelForCausalLM, AutoTokenizer, PreTrainedTokenizer
-
+from anthropic import Anthropic
 from ._utils import with_max_batchsize
 
 
@@ -19,56 +17,36 @@ class Judge(abc.ABC):
     """
 
     @classmethod
-    def from_name(cls, name: str, **kwargs) -> "Judge":
+    def from_name(cls, name: str) -> "Judge":
         match name:
             case "adaptive_attacks":
                 from .adaptive_attacks import AdaptiveAttacksJudge
 
-                return AdaptiveAttacksJudge(**kwargs)
+                return AdaptiveAttacksJudge()
             case "advprefix":
                 from .advprefix import AdvPrefixJudge
 
-                return AdvPrefixJudge(**kwargs)
-            case "aegis_guard":
-                from .aegis_guard import AegisGuardJudge
-
-                return AegisGuardJudge(**kwargs)
+                return AdvPrefixJudge()
             case "harmbench":
                 from .harmbench import HarmBenchJudge
 
-                return HarmBenchJudge(**kwargs)
-            case "intention_analysis":
-                from .intention_analysis import IntentionAnalysisJudge
-
-                return IntentionAnalysisJudge(**kwargs)
-            case "jail_judge":
-                from .jail_judge import JailJudge
-
-                return JailJudge(**kwargs)
-            case "llama_guard_3":
+                return HarmBenchJudge()
+            case "llama_guard_3_8b":
                 from .llama_guard_3 import LlamaGuard3Judge
 
-                return LlamaGuard3Judge(**kwargs)
-            case "llama_guard_4":
+                return LlamaGuard3Judge()
+            case "llama_guard_4_12b":
                 from .llama_guard_4 import LlamaGuard4Judge
 
-                return LlamaGuard4Judge(**kwargs)
-            case "md_judge":
-                from .md_judge import MDJudge
-
-                return MDJudge(**kwargs)
+                return LlamaGuard4Judge()
             case "strong_reject":
                 from .strong_reject import StrongRejectJudge
 
-                return StrongRejectJudge(**kwargs)
-            case "strong_reject_rubric":
-                from .strong_reject import StrongRejectRubricJudge
-
-                return StrongRejectRubricJudge(**kwargs)
+                return StrongRejectJudge()
             case "xstest":
                 from .xstest import XSTestJudge
 
-                return XSTestJudge(**kwargs)
+                return XSTestJudge()
             case _:
                 raise ValueError(f"Unknown judge {name}")
 
@@ -76,7 +54,7 @@ class Judge(abc.ABC):
     def judge(
         self,
         chats: list[list[dict[str, str]]],
-    ) -> dict[str, list[float | None]]:
+    ) -> dict[str, list[float]] | None:
         """
         Judges a batch of interactions (chats).
 
@@ -132,31 +110,21 @@ class Judge(abc.ABC):
         inputs: list[str],
     ) -> tuple[torch.Tensor, torch.Tensor]:
         """
-        Tokenizes the inputs and validates that the input is not too long.
-
-        Args:
-            tokenizer: The tokenizer to use.
-            inputs: The inputs to tokenize.
-
-        Returns:
-            A tuple of tensors containing the input IDs and attention masks.
+        Validates that the input is not too long.
         """
         encoded = tokenizer(
             text=inputs, return_tensors="pt", padding=True, truncation=True
         )
         if encoded.input_ids.shape[1] < tokenizer.model_max_length:
             return encoded
-
-        for i, input_text in enumerate(inputs):
-            token_length = len(
-                tokenizer(input_text, padding=True, truncation=False).input_ids
-            )
-            if token_length > tokenizer.model_max_length:
+        for i in range(len(inputs)):
+            if (
+                l := len(tokenizer(inputs[i], padding=True, truncation=False).input_ids)
+            ) > tokenizer.model_max_length:
                 logging.warning(
-                    f"Sequence {i} is longer than the specified maximum sequence length "
-                    f"for this model ({token_length} > {tokenizer.model_max_length}). "
-                    f"This sequence will be truncated, which may lead to incorrect results."
+                    f"Sequence is longer than the specified maximum sequence length for this model ({l} > {tokenizer.model_max_length}). This sequence will be truncated, which may lead to incorrect results."
                 )
+                return encoded
         return encoded
 
 
@@ -230,9 +198,7 @@ class PromptBasedJudge(Judge):
                     f"Unknown remote foundation model {remote_foundation_model}"
                 )
 
-    def batch_inference(
-        self, conversations: list[list[dict[str, str]]], max_new_tokens: int = 128
-    ) -> list[str]:
+    def batch_inference(self, inputs: list[str]) -> list[str]:
         """
         Batch inference for prompt-based judges.
         """
@@ -240,11 +206,11 @@ class PromptBasedJudge(Judge):
             if getattr(self.tokenizer, "chat_template"):
                 inputs = [
                     self.tokenizer.apply_chat_template(
-                        conversation,
+                        [{"role": "user", "content": input}],
                         tokenize=False,
                         add_generation_prompt=True,
                     )
-                    for conversation in conversations
+                    for input in inputs
                 ]
             tokens = self.tokenize_sequences(self.tokenizer, inputs).to(
                 self.classifier.device
@@ -252,7 +218,7 @@ class PromptBasedJudge(Judge):
             generated_ids = self.classifier.generate(
                 **tokens,
                 do_sample=False,
-                max_new_tokens=max_new_tokens,
+                max_new_tokens=128,
                 use_cache=True,
             )
             # Decode *only* the generated part, skipping input prompt
