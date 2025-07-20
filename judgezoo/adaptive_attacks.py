@@ -41,17 +41,8 @@ is a number from 1 to 10, e,g, “Rating: [[5]]”."""
         local_foundation_model: str | None = None,
         remote_foundation_model: str | None = None,
     ):
-        super().__init__(
-            use_local_model, local_foundation_model, remote_foundation_model
-        )
-        if self.use_local_model:
-            logging.warning(
-                f"AdaptiveAttacksJudge originally used gpt-4-0613, you are using {self.local_foundation_model}. Results may differ from the original paper."
-            )
-        elif not self.use_local_model and self.remote_foundation_model != "gpt-4-0613":
-            logging.warning(
-                f"AdaptiveAttacksJudge originally used gpt-4-0613, you are using {self.remote_foundation_model}. Results may differ from the original paper."
-            )
+        super().__init__(use_local_model, local_foundation_model, remote_foundation_model)
+        self.check_model("gpt-4-0613", "AdaptiveAttacksJudge")
 
     def judge(
         self,
@@ -67,12 +58,7 @@ is a number from 1 to 10, e,g, “Rating: [[5]]”."""
         generations = [c[-1]["content"] for c in chats]
 
         conversations = [
-            [
-                {
-                    "role": "user",
-                    "content": self.JUDGE_PROMPT.format(task=b, generation=g),
-                }
-            ]
+            [{"role": "user", "content": self.JUDGE_PROMPT.format(task=b, generation=g)}]
             for b, g in zip(task, generations)
         ]
 

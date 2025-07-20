@@ -45,6 +45,25 @@ CLASS:"""
     # Makes sure to capture the *last* occurrence if multiple exist
     CLASSIFICATION_PATTERN = re.compile(r".*\[\[(.*?)\]\]", re.DOTALL)
 
+
+    def __init__(
+        self,
+        use_local_model: bool | None = None,
+        local_foundation_model: str | None = None,
+        remote_foundation_model: str | None = None,
+    ):
+        super().__init__(
+            use_local_model, local_foundation_model, remote_foundation_model
+        )
+        if self.use_local_model:
+            logging.warning(
+                f"XSTestJudge originally used gpt-4-0613, you are using {self.local_foundation_model}. Results may differ from the original paper."
+            )
+        elif not self.use_local_model and self.remote_foundation_model != "gpt-4-0613":
+            logging.warning(
+                f"XSTestJudge originally used gpt-4-0613, you are using {self.remote_foundation_model}. Results may differ from the original paper."
+            )
+
     def judge(
         self,
         chats: list[list[dict[str, str]]],

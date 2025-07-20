@@ -57,3 +57,6 @@ Issues = "https://github.com/LLM-QC/judgezoo/issues"
 where = ["."]
 include = ["judgezoo*"]
 exclude = ["tests*"]
+
+[tool.black]
+line-length = 100

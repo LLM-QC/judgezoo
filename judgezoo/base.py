@@ -139,16 +139,12 @@ class Judge(abc.ABC):
         Returns:
             A tuple of tensors containing the input IDs and attention masks.
         """
-        encoded = tokenizer(
-            text=inputs, return_tensors="pt", padding=True, truncation=True
-        )
+        encoded = tokenizer(text=inputs, return_tensors="pt", padding=True, truncation=True)
         if encoded.input_ids.shape[1] < tokenizer.model_max_length:
             return encoded
 
         for i, input_text in enumerate(inputs):
-            token_length = len(
-                tokenizer(input_text, padding=True, truncation=False).input_ids
-            )
+            token_length = len(tokenizer(input_text, padding=True, truncation=False).input_ids)
             if token_length > tokenizer.model_max_length:
                 logging.warning(
                     f"Sequence {i} is longer than the specified maximum sequence length "
@@ -183,13 +179,9 @@ class PromptBasedJudge(Judge):
             USE_LOCAL_MODEL,
         )
 
-        self.use_local_model = (
-            use_local_model if use_local_model is not None else USE_LOCAL_MODEL
-        )
+        self.use_local_model = use_local_model if use_local_model is not None else USE_LOCAL_MODEL
         self.local_foundation_model = (
-            local_foundation_model
-            if local_foundation_model is not None
-            else LOCAL_FOUNDATION_MODEL
+            local_foundation_model if local_foundation_model is not None else LOCAL_FOUNDATION_MODEL
         )
         self.remote_foundation_model = (
             remote_foundation_model
@@ -216,17 +208,29 @@ class PromptBasedJudge(Judge):
             self.classifier = None
             self.tokenizer = None
             if "gpt" in self.remote_foundation_model:
-                self.chat_provider = self.OpenAIProvider(
-                    model_name=self.remote_foundation_model
-                )
+                self.chat_provider = self.OpenAIProvider(model_name=self.remote_foundation_model)
             elif "claude" in self.remote_foundation_model:
-                self.chat_provider = self.AnthropicProvider(
-                    model_name=self.remote_foundation_model
-                )
+                self.chat_provider = self.AnthropicProvider(model_name=self.remote_foundation_model)
             else:
-                raise ValueError(
-                    f"Unknown remote foundation model {remote_foundation_model}"
-                )
+                raise ValueError(f"Unknown remote foundation model {self.remote_foundation_model}")
+
+    def check_model(self, expected_model: str, judge_name: str) -> None:
+        """
+        Check if the model being used matches the expected model from the original paper.
+        Log a warning if they don't match.
+
+        Args:
+            expected_model: The model name that was originally used in the paper
+            judge_name: The name of the judge for logging purposes
+        """
+        if self.use_local_model and expected_model not in self.local_foundation_model:
+            logging.warning(
+                f"{judge_name} originally used {expected_model}, you are using {self.local_foundation_model}. Results may differ from the original paper."
+            )
+        elif not self.use_local_model and expected_model not in self.remote_foundation_model:
+            logging.warning(
+                f"{judge_name} originally used {expected_model}, you are using {self.remote_foundation_model}. Results may differ from the original paper."
+            )
 
     def batch_inference(
         self,
@@ -247,9 +251,7 @@ class PromptBasedJudge(Judge):
                     )
                     for conversation in conversations
                 ]
-            tokens = self.tokenize_sequences(self.tokenizer, inputs).to(
-                self.classifier.device
-            )
+            tokens = self.tokenize_sequences(self.tokenizer, inputs).to(self.classifier.device)
             generated_ids = self.classifier.generate(
                 **tokens,
                 do_sample=False,

@@ -39,20 +39,8 @@ Assistant's answer.
         local_foundation_model: str | None = None,
         remote_foundation_model: str | None = None,
     ):
-        super().__init__(
-            use_local_model, local_foundation_model, remote_foundation_model
-        )
-        if self.use_local_model and self.local_foundation_model != "gpt-3.5-turbo-0613":
-            logging.warning(
-                f"IntentionAnalysisJudge originally used gpt-3.5-turbo-0613, you are using {self.local_foundation_model}. Results may differ from the original paper."
-            )
-        elif (
-            not self.use_local_model
-            and self.remote_foundation_model != "gpt-3.5-turbo-0613"
-        ):
-            logging.warning(
-                f"IntentionAnalysisJudge originally used gpt-3.5-turbo-0613, , you are using {self.remote_foundation_model}. Results may differ from the original paper."
-            )
+        super().__init__(use_local_model, local_foundation_model, remote_foundation_model)
+        self.check_model("gpt-3.5-turbo-0613", "IntentionAnalysisJudge")
 
         self.score_map = {
             "A": 1.0,
