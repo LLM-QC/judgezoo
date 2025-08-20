@@ -32,6 +32,10 @@ dependencies = [
     "transformers>=4.45.0",
     "numpy",
     "openai",
+    "anthropic",
+    "ipykernel",
+    "peft",
+    "sentencepiece",
 ]
 
 [project.optional-dependencies]

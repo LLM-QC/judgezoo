@@ -12,6 +12,10 @@ setup(
         "transformers>=4.45.0",
         "numpy",
         "openai",
+        "anthropic",
+        "ipykernel",
+        "peft",
+        "sentencepiece",
     ],
     extras_require={
         "test": [
