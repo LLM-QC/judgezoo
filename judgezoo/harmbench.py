@@ -12,7 +12,7 @@ import logging
 from enum import Enum
 
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, PreTrainedTokenizer
 
 from ._utils import parse_chat_template
 from .base import FineTunedJudge
@@ -54,12 +54,8 @@ Answer:""",
         },
     ]
 
-    def __init__(
-        self, classifier: HarmBenchClassifier = HarmBenchClassifier.LLAMA_2_13B
-    ):
-        assert (
-            classifier in HarmBenchClassifier
-        ), f"Invalid classifier: {classifier}"
+    def __init__(self, classifier: HarmBenchClassifier = HarmBenchClassifier.LLAMA_2_13B):
+        assert classifier in HarmBenchClassifier, f"Invalid classifier: {classifier}"
 
         self.classifier = AutoModelForCausalLM.from_pretrained(
             classifier.value, torch_dtype=torch.bfloat16, device_map="auto"
@@ -134,19 +130,7 @@ Answer:""",
         if not self.validate_chats(chats):
             return {"p_harmful": [None] * len(chats)}
 
-        cls_prompt = self.tokenizer.apply_chat_template(
-            self.CLS_CONVERSATION, tokenize=False
-        )
-
-        inputs = [
-            cls_prompt.format(
-                behavior=b[0]["content"],
-                generation=b[-1]["content"],
-            )
-            for b in chats
-        ]
-
-        encoded = self.tokenize_sequences(self.tokenizer, inputs)
+        encoded = self.tokenize_sequences(self.tokenizer, chats)
         encoded = encoded.to(self.classifier.device)
 
         generation = self.classifier.generate(
@@ -166,3 +150,64 @@ Answer:""",
             )
 
         return {"p_harmful": yes_prob.cpu().tolist()}
+
+    def tokenize_sequences(
+        self,
+        tokenizer: PreTrainedTokenizer,
+        chats: list[list[dict[str, str]]],
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        """
+        Tokenizes the inputs and validates that the input is not too long. We're using
+        a custom version here to truncate only the generation part of the prompt.
+
+        Args:
+            tokenizer: The tokenizer to use.
+            inputs: The inputs to tokenize.
+            chats: The chats to truncate.
+            cls_prompt: The prompt to use for truncation.
+
+        Returns:
+            A tuple of tensors containing the input IDs and attention masks.
+        """
+        cls_prompt = tokenizer.apply_chat_template(self.CLS_CONVERSATION, tokenize=False)
+
+        inputs = [
+            cls_prompt.format(
+                behavior=b[0]["content"],
+                generation=b[-1]["content"],
+            )
+            for b in chats
+        ]
+
+        encoded = tokenizer(text=inputs, return_tensors="pt", padding=True, truncation=True)
+        if encoded.input_ids.shape[1] < tokenizer.model_max_length:
+            return encoded
+
+        for i, input in enumerate(inputs):
+            token_length = len(tokenizer(input, padding=True, truncation=False).input_ids)
+            if token_length > tokenizer.model_max_length:
+                logging.warning(
+                    f"Sequence {i} is longer than the specified maximum sequence length "
+                    f"for this model ({token_length} > {tokenizer.model_max_length}). "
+                    f"This sequence will be truncated, which may lead to incorrect results."
+                )
+                to_remove = token_length - tokenizer.model_max_length
+                chats[i][-1]["content"] = tokenizer.decode(
+                    tokenizer(
+                        chats[i][-1]["content"],
+                        padding=True,
+                        truncation=False,
+                        add_special_tokens=False,
+                    ).input_ids[:-to_remove]
+                ).removeprefix(tokenizer.bos_token)
+
+        inputs = [
+            cls_prompt.format(
+                behavior=b[0]["content"],
+                generation=b[-1]["content"],
+            )
+            for b in chats
+        ]
+
+        encoded = tokenizer(text=inputs, return_tensors="pt", padding=True, truncation=True)
+        return encoded

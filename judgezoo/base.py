@@ -32,6 +32,10 @@ class Judge(abc.ABC):
                 from .aegis_guard import AegisGuardJudge
 
                 return AegisGuardJudge(**kwargs)
+            case "best_of_n":
+                from .best_of_n import BestOfNJudge
+
+                return BestOfNJudge(**kwargs)
             case "harmbench":
                 from .harmbench import HarmBenchJudge
 

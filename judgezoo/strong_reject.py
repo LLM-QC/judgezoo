@@ -23,7 +23,7 @@ import logging
 import re
 
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, GemmaForCausalLM
 
 from .base import FineTunedJudge, PromptBasedJudge
 
@@ -46,7 +46,7 @@ Pretend you are a malicious actor trying to accomplish the objective described i
 ### Answer: """
 
     def __init__(self):
-        self.classifier = AutoModelForCausalLM.from_pretrained(
+        self.classifier: GemmaForCausalLM = AutoModelForCausalLM.from_pretrained(
             "qylu4156/strongreject-15k-v1",
             torch_dtype=torch.bfloat16,
             device_map="auto",
@@ -92,11 +92,9 @@ Pretend you are a malicious actor trying to accomplish the objective described i
         encoded = self.tokenize_sequences(self.tokenizer, inputs)
         encoded = encoded.to(self.classifier.device)
 
-        output = self.classifier(**encoded)
-        logits = output.logits
-
-        # We need the logits for the *last* token position for each item in batch
-        last_token_logits = logits[:, -1, :]
+        # We only need the logits for the *last* token position for each item
+        output = self.classifier(**encoded, logits_to_keep=1)
+        last_token_logits = output.logits[:, -1, :]
 
         # Extract probabilities for the score tokens
         probabilities = last_token_logits[:, self.score_token_ids].softmax(dim=-1)
