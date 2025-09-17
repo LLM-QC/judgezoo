@@ -48,6 +48,7 @@ print(scores)
 | Adaptive Attacks       | `adaptive_attacks`    | Andriushchenko et al. (2024) | [arXiv:2404.02151](https://arxiv.org/abs/2404.02151)| prompt-based | —                      |
 | AdvPrefix              | `advprefix`           | Zhu et al. (2024)            | [arXiv:2412.10321](https://arxiv.org/abs/2412.10321)| prompt-based | —                      |
 | AegisGuard*            | `aegis_guard`         | Ghosh et al. (2024)          | [arXiv:2404.05993](https://arxiv.org/abs/2404.05993)| fine-tuned   | LlamaGuard 7B          |
+| BestOfN^               | `best_of_n`           | Hughes et al. (2024)         | [arXiv:2412.03556](https://arxiv.org/abs/2412.03556)| wrapper      | -                      |
 | HarmBench              | `harmbench`           | Mazeika et al. (2024)        | [arXiv:2402.04249](https://arxiv.org/abs/2402.04249)| fine-tuned   | Gemma 2B               |
 | JailJudge              | `jail_judge`          | Liu et al. (2024)            | [arXiv:2410.12855](https://arxiv.org/abs/2410.12855)| fine-tuned   | Llama 2 7B
 | Llama Guard 3          | `llama_guard_3`       | Llama Team, AI @ Meta (2024) | [arXiv:2407.21783](https://arxiv.org/abs/2407.21783)| fine-tuned   | Llama 3 8B             |
@@ -58,6 +59,8 @@ print(scores)
 | XSTestJudge            | `xstest`              | Röttge et al. (2023)         | [arXiv:2308.01263](https://arxiv.org/abs/2308.01263)| prompt-based | —                      |
 
 \* there are two versions of this judge (permissive and defensive). You can switch between them using `Judge.from_name("aegis_guard", defensive=[True/False])`
+
+\^ This judge adds additional rule-based false-positive detection to a `base_judge`.
 
 
 ## Other
