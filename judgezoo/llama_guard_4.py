@@ -15,7 +15,7 @@ class LlamaGuard4Judge(FineTunedJudge):
     def __init__(self):
         self.classifier = Llama4ForConditionalGeneration.from_pretrained(
             "meta-llama/Llama-Guard-4-12B",
-            torch_dtype=torch.bfloat16,
+            dtype=torch.bfloat16,
             device_map="auto"
         )
         self.tokenizer = AutoProcessor.from_pretrained(

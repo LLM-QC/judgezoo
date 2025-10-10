@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "judgezoo"
-version = "0.1.5"
+version = "0.1.6"
 description = "A collection of judges for evaluating LLM model output for safety & toxicity with a standardized API."
 readme = "README.md"
 requires-python = ">=3.8"
@@ -29,7 +29,7 @@ classifiers = [
 ]
 dependencies = [
     "torch>=2.3.1",
-    "transformers>=4.45.0",
+    "transformers>=4.57.0",
     "numpy",
     "openai",
     "anthropic",

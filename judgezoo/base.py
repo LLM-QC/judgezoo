@@ -195,7 +195,7 @@ class PromptBasedJudge(Judge):
             self.chat_provider = None
             self.classifier = AutoModelForCausalLM.from_pretrained(
                 self.local_foundation_model,
-                torch_dtype=torch.bfloat16,
+                dtype=torch.bfloat16,
                 device_map="auto",
             )
             self.tokenizer = AutoTokenizer.from_pretrained(

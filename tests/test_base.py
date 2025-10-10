@@ -157,8 +157,6 @@ class TestPromptBasedJudge:
         judge = ConcretePromptBasedJudge()
 
         assert judge.use_local_model is True
-        assert judge.api_client is None
-        assert judge.api_model is None
         assert judge.classifier is not None
         assert judge.tokenizer is not None
 
@@ -173,8 +171,8 @@ class TestPromptBasedJudge:
         judge = ConcretePromptBasedJudge()
 
         assert judge.use_local_model is False
-        assert judge.api_client is not None
-        assert judge.api_model == 'gpt-4o'
+        assert judge.chat_provider is not None
+        assert judge.remote_foundation_model == 'gpt-4o'
         assert judge.classifier is None
 
     @patch('judgezoo.config.USE_LOCAL_MODEL', False)

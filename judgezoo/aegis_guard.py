@@ -167,7 +167,7 @@ Provide your safety assessment for Assistant in the above conversation:
         base_name = "meta-llama/LlamaGuard-7b"
 
         base_model = AutoModelForCausalLM.from_pretrained(
-            base_name, torch_dtype=torch.bfloat16, device_map="auto"
+            base_name, dtype=torch.bfloat16, device_map="auto"
         )
         self.classifier = PeftModel.from_pretrained(base_model, adapter_name)
 

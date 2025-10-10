@@ -23,7 +23,7 @@ class LlamaGuard3Judge(FineTunedJudge):
     def __init__(self):
         self.classifier = AutoModelForCausalLM.from_pretrained(
             "meta-llama/Llama-Guard-3-8B",
-            torch_dtype=torch.bfloat16,
+            dtype=torch.bfloat16,
             device_map="auto"
         )
         self.tokenizer = AutoTokenizer.from_pretrained(

@@ -58,7 +58,7 @@ Answer:""",
         assert classifier in HarmBenchClassifier, f"Invalid classifier: {classifier}"
 
         self.classifier = AutoModelForCausalLM.from_pretrained(
-            classifier.value, torch_dtype=torch.bfloat16, device_map="auto"
+            classifier.value, dtype=torch.bfloat16, device_map="auto"
         )
         self.tokenizer = AutoTokenizer.from_pretrained(
             classifier.value,

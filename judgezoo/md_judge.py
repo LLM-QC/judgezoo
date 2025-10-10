@@ -38,7 +38,7 @@ class MDJudge(FineTunedJudge):
 
         self.classifier = AutoModelForCausalLM.from_pretrained(
             model_name,
-            torch_dtype=torch.bfloat16,
+            dtype=torch.bfloat16,
             device_map="auto",
             trust_remote_code=True
         )
@@ -286,6 +286,7 @@ Provide your safety assessment for Agent's response to the User's instruction in
         outputs = self.classifier.generate(
             **encoded,
             max_new_tokens=256,
+            use_cache=False,  # Needed to avoid bug in recent transformers versions
             return_dict_in_generate=True,
         )
         decoded_sequences = self.tokenizer.batch_decode(

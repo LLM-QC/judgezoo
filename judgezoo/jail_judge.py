@@ -29,7 +29,7 @@ class JailJudge(FineTunedJudge):
         """
         self.classifier = AutoModelForCausalLM.from_pretrained(
             "usail-hkust/JailJudge-guard",
-            torch_dtype=torch.bfloat16,
+            dtype=torch.bfloat16,
             device_map="auto",
         )
         self.tokenizer = AutoTokenizer.from_pretrained("usail-hkust/JailJudge-guard")
