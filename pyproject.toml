@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "judgezoo"
-version = "0.1.6"
+version = "0.1.7"
 description = "A collection of judges for evaluating LLM model output for safety & toxicity with a standardized API."
 readme = "README.md"
 requires-python = ">=3.8"
