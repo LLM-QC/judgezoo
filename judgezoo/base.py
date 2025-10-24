@@ -178,8 +178,7 @@ class PromptBasedJudge(Judge):
         local_foundation_model: str | None = None,
         remote_foundation_model: str | None = None,
     ):
-        from .config import (LOCAL_FOUNDATION_MODEL, REMOTE_FOUNDATION_MODEL,
-                             USE_LOCAL_MODEL)
+        from .config import LOCAL_FOUNDATION_MODEL, REMOTE_FOUNDATION_MODEL, USE_LOCAL_MODEL
 
         self.use_local_model = use_local_model if use_local_model is not None else USE_LOCAL_MODEL
         self.local_foundation_model = (
@@ -301,15 +300,41 @@ class PromptBasedJudge(Judge):
             temperature: float,
         ) -> str:
             if conversation[-1]["role"] == "assistant":
-                logging.warning(f"OpenAI API does not support prefilling, removing last assistant message.")
+                logging.warning(
+                    f"OpenAI API does not support prefilling, removing last assistant message."
+                )
                 conversation = conversation[:-1]
-            response = self.api_client.chat.completions.create(
-                model=self.api_model,
-                messages=conversation,
-                max_tokens=max_new_tokens,
-                temperature=temperature,
-            )
-            return response.choices[0].message.content
+            if max_new_tokens < 16:
+                logging.warning(
+                    f"OpenAI API requires the generation of at least 16 tokens, adjusting max_new_tokens from {max_new_tokens} to 16."
+                )
+                max_new_tokens = 16
+            try:
+                response = self.api_client.responses.create(
+                    model=self.api_model,
+                    input=conversation,
+                    max_output_tokens=max_new_tokens,
+                    temperature=temperature,
+                )
+            except Exception as e:
+                msg = str(e)
+                logging.error(f"Error occurred while calling OpenAI API: {msg}")
+                if ("Unsupported parameter: 'max_tokens'" in msg) or (
+                    "Unsupported parameter: 'temperature'" in msg
+                ):
+                    logging.warning("For reasoning models, max new tokens need to be at least 25.")
+                    if max_new_tokens < 25:
+                        max_new_tokens = 25
+                    response = self.api_client.responses.create(
+                        model=self.api_model,
+                        input=conversation,
+                        max_output_tokens=max_new_tokens,
+                        reasoning={"effort": "minimal"},
+                    )
+                    logging.warning(response)
+                else:
+                    raise e
+            return response.output_text
 
     class AnthropicProvider(ChatProvider):
         def __init__(self, model_name: str):
