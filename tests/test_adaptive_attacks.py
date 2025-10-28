@@ -66,20 +66,22 @@ class TestAdaptiveAttacksJudge:
 
         # Verify the judge was created successfully
         assert judge is not None
-        assert hasattr(judge, "JUDGE_PROMPT")
+        assert hasattr(judge, "JUDGE_SYSTEM_PROMPT")
+        assert hasattr(judge, "JUDGE_USER_PROMPT")
         assert hasattr(judge, "CLASSIFICATION_PATTERN")
 
         # Verify the prompt contains expected elements
-        assert "red teaming assistant" in judge.JUDGE_PROMPT
-        assert "Rating: [[rating]]" in judge.JUDGE_PROMPT
-        assert "scale from 1 to 10" in judge.JUDGE_PROMPT
+        assert "red teaming assistant" in judge.JUDGE_SYSTEM_PROMPT
+        assert "Rating: [[rating]]" in judge.JUDGE_SYSTEM_PROMPT
+        assert "scale from 1 to 10" in judge.JUDGE_SYSTEM_PROMPT
 
     @pytest.mark.slow
     def test_init_local(self, adaptive_attacks_judge_local):
         """Test AdaptiveAttacksJudge initialization with local model."""
         judge = adaptive_attacks_judge_local
         assert judge is not None
-        assert hasattr(judge, "JUDGE_PROMPT")
+        assert hasattr(judge, "JUDGE_SYSTEM_PROMPT")
+        assert hasattr(judge, "JUDGE_USER_PROMPT")
         assert hasattr(judge, "CLASSIFICATION_PATTERN")
 
     @pytest.mark.slow
@@ -87,7 +89,9 @@ class TestAdaptiveAttacksJudge:
         """Test judge method with valid chats."""
         judge = adaptive_attacks_judge
 
-        result = judge.judge(sample_chats)
+        # For adaptive attacks, target_chats represents the desired harmful behavior
+        # Here we use sample_chats as both the actual and target for simplicity
+        result = judge.judge(sample_chats, sample_chats)
 
         # Verify the result structure
         assert isinstance(result, dict)
@@ -107,7 +111,7 @@ class TestAdaptiveAttacksJudge:
         """Test judge method with invalid chats."""
         judge = adaptive_attacks_judge
 
-        result = judge.judge(invalid_chats)
+        result = judge.judge(invalid_chats, invalid_chats)
 
         # Should return dict with None values for invalid chats
         assert isinstance(result, dict)
@@ -121,7 +125,7 @@ class TestAdaptiveAttacksJudge:
         """Test judge with a clearly safe conversation."""
         judge = adaptive_attacks_judge
 
-        result = judge.judge(harmless_conversations)
+        result = judge.judge(harmless_conversations, harmless_conversations)
 
         assert isinstance(result, dict)
         assert "p_harmful" in result
@@ -139,8 +143,8 @@ class TestAdaptiveAttacksJudge:
         """Test judge with a potentially harmful conversation."""
         judge = adaptive_attacks_judge
 
-        # This is a refusal case that should get low rating
-        result = judge.judge(harmful_conversations)
+        # This is a harmful case that should get high rating
+        result = judge.judge(harmful_conversations, harmful_conversations)
 
         assert isinstance(result, dict)
         assert "p_harmful" in result
@@ -148,7 +152,7 @@ class TestAdaptiveAttacksJudge:
         assert len(result["p_harmful"]) == len(harmful_conversations)
         assert len(result["rating"]) == len(harmful_conversations)
 
-        # For a refusal, we expect low rating
+        # For harmful conversations, we expect higher ratings
         if all(r is not None for r in result["rating"]):
             assert all(r >= 3 for r in result["rating"])
             assert all(0.3 <= p <= 1.0 for p in result["p_harmful"])
@@ -158,7 +162,7 @@ class TestAdaptiveAttacksJudge:
         """Test judge with multiple harmless chats."""
         judge = adaptive_attacks_judge
 
-        result = judge.judge(harmless_conversations)
+        result = judge.judge(harmless_conversations, harmless_conversations)
 
         assert isinstance(result, dict)
         assert "p_harmful" in result
@@ -177,7 +181,7 @@ class TestAdaptiveAttacksJudge:
         """Test judge with multiple harmless chats using callable interface."""
         judge = adaptive_attacks_judge
 
-        result = judge(harmless_conversations)
+        result = judge(harmless_conversations, harmless_conversations)
 
         assert isinstance(result, dict)
         assert "p_harmful" in result
@@ -190,7 +194,8 @@ class TestAdaptiveAttacksJudge:
         """Test judge with mixed harmful and safe chats."""
         judge = adaptive_attacks_judge
 
-        result = judge.judge(harmful_conversations + harmless_conversations)
+        mixed_chats = harmful_conversations + harmless_conversations
+        result = judge.judge(mixed_chats, mixed_chats)
 
         assert isinstance(result, dict)
         assert "p_harmful" in result
@@ -211,7 +216,7 @@ class TestAdaptiveAttacksJudge:
         """Test judge with empty chat list."""
         judge = adaptive_attacks_judge
 
-        result = judge.judge([])
+        result = judge.judge([], [])
 
         assert isinstance(result, dict)
         assert "p_harmful" in result
@@ -239,8 +244,8 @@ class TestAdaptiveAttacksJudge:
         ]
 
         # Run the same input multiple times
-        result1 = judge.judge(chat)
-        result2 = judge.judge(chat)
+        result1 = judge.judge(chat, chat)
+        result2 = judge.judge(chat, chat)
 
         # Results should be identical (no sampling in the base model)
         assert result1["p_harmful"] == result2["p_harmful"]
@@ -289,7 +294,7 @@ class TestAdaptiveAttacksJudge:
         ]
 
         # This should run without errors and produce a result
-        result = judge.judge(test_chat)
+        result = judge.judge(test_chat, test_chat)
 
         assert isinstance(result, dict)
         assert "p_harmful" in result
@@ -325,7 +330,7 @@ class TestAdaptiveAttacksJudge:
         ]
 
         # Run the judge
-        result = judge.judge(test_chat)
+        result = judge.judge(test_chat, test_chat)
 
         # Should still return a result, even if rating is None
         assert isinstance(result, dict)
@@ -347,10 +352,51 @@ class TestAdaptiveAttacksJudge:
         """Test that ratings are within expected bounds."""
         judge = adaptive_attacks_judge
 
-        result = judge.judge(harmless_conversations)
+        result = judge.judge(harmless_conversations, harmless_conversations)
 
         # If we get a valid rating, it should be between 1 and 10
         if all(r is not None for r in result["rating"]):
             assert all(1 <= r <= 10 for r in result["rating"])
             # And p_harmful should be between 0 and 1
             assert all(0.0 <= p <= 1.0 for p in result["p_harmful"])
+
+    def test_missing_target_chats(self, adaptive_attacks_judge, harmless_conversations):
+        """Test that calling judge without target_chats raises TypeError."""
+        judge = adaptive_attacks_judge
+
+        # Should raise TypeError when target_chats is missing
+        with pytest.raises(TypeError, match="missing 1 required positional argument: 'target_chats'"):
+            judge.judge(harmless_conversations)
+
+    def test_mismatched_length_target_chats(self, adaptive_attacks_judge, harmless_conversations):
+        """Test that mismatched lengths between chats and target_chats raises an error."""
+        judge = adaptive_attacks_judge
+
+        # Create target_chats with different length
+        mismatched_target = harmless_conversations[:2]  # Only 2 items vs 4 in harmless_conversations
+
+        # Should raise ValueError from with_max_batchsize
+        with pytest.raises(ValueError, match="All inputs must have the same length"):
+            judge(harmless_conversations, mismatched_target)
+
+    def test_invalid_target_chats_format(self, adaptive_attacks_judge):
+        """Test that invalid target_chats format is handled gracefully."""
+        judge = adaptive_attacks_judge
+
+        # Valid chats
+        valid_chats = [
+            [
+                {"role": "user", "content": "Test question"},
+                {"role": "assistant", "content": "Test answer"}
+            ]
+        ]
+
+        # Invalid target_chats (missing required message structure)
+        invalid_target = [
+            [{"role": "user", "content": "Missing assistant response"}]
+        ]
+
+        # Should return None values for invalid chats
+        result = judge.judge(valid_chats, invalid_target)
+        assert result["p_harmful"] == [None]
+        assert result["rating"] == [None]

@@ -60,6 +60,10 @@ class Judge(abc.ABC):
                 from .md_judge import MDJudge
 
                 return MDJudge(**kwargs)
+            case "pair":
+                from .pair import PAIRJudge
+
+                return PAIRJudge(**kwargs)
             case "strong_reject":
                 from .strong_reject import StrongRejectJudge
 
@@ -79,6 +83,7 @@ class Judge(abc.ABC):
     def judge(
         self,
         chats: list[list[dict[str, str]]],
+        *args,
     ) -> dict[str, list[float | None]]:
         """
         Judges a batch of interactions (chats).
@@ -88,6 +93,7 @@ class Judge(abc.ABC):
                    dictionaries with "role" and "content" keys. The structure
                    expected (e.g., last message is assistant generation) might
                    vary depending on the concrete judge implementation.
+            *args: Additional arguments to pass to the judge method.
 
         Returns:
             A dictionary containing results
@@ -96,10 +102,10 @@ class Judge(abc.ABC):
 
     @torch.no_grad()
     def __call__(
-        self, chats: list[list[dict[str, str]]], verbose: bool = False
+        self, chats: list[list[dict[str, str]]], *args, verbose: bool = False, **kwargs
     ) -> dict[str, list[float]]:
         """Allows calling the judge instance directly."""
-        return with_max_batchsize(self.judge, chats, verbose=verbose)
+        return with_max_batchsize(self.judge, chats, *args, verbose=verbose, **kwargs)
 
     @staticmethod
     def validate_chats(

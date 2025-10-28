@@ -13,6 +13,7 @@ def with_max_batchsize(
     *inputs,
     initial_batch_size: int | None = None,
     verbose: bool = False,
+    **kwargs,
 ) -> torch.Tensor | tuple[torch.Tensor, ...] | dict[str, list[float]] | list[float]:
     """
     Dynamically adjust batch size if an OOM error occurs.
@@ -28,6 +29,8 @@ def with_max_batchsize(
             Starting batch size for execution.
         verbose:
             Whether to print progress.
+        **kwargs:
+            Additional keyword arguments to pass to the function. These are passed as-is and not batched.
     Returns:
         The output of the function.
     """
@@ -45,6 +48,16 @@ def with_max_batchsize(
                 f"All inputs must have the same length. "
                 f"Input 0 has length {input_length}, but input {i} has length {len(inp)}."
             )
+
+    # Identify which kwargs are lists that should be batched
+    batchable_kwargs = {}
+    static_kwargs = {}
+    for key, value in kwargs.items():
+        if ((isinstance(value, list) or isinstance(value, torch.Tensor))
+            and len(value) == input_length):
+            batchable_kwargs[key] = value
+        else:
+            static_kwargs[key] = value
 
     outputs = []
     i = 0
@@ -70,7 +83,11 @@ def with_max_batchsize(
             free_vram()
             # Create chunks for all inputs
             chunks = [inp[i : i + batch_size] for inp in inputs]
-            output = function(*chunks)
+            # Create chunks for batchable kwargs
+            batched_kwargs = {key: value[i : i + batch_size] for key, value in batchable_kwargs.items()}
+            # Combine static and batched kwargs
+            all_kwargs = {**static_kwargs, **batched_kwargs}
+            output = function(*chunks, **all_kwargs)
             outputs.append(output)
             i += batch_size  # Move to the next batch
             if verbose:

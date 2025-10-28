@@ -34,9 +34,24 @@ Depending on the original setup, the judge may also return discrete scores or ha
 In these cases, the raw scores are also returned:
 
 ```python3
-judge = Judge.from_name("adaptive_attacks")
+judge = Judge.from_name("strong_reject")
 
 scores = judge([harmful_conversation])
+print(scores)
+>>> {"p_harmful": 0.9, "rating": "5"}
+```
+
+Some judges may have additional API requirements. For example, the Adaptive Attacks judge requires target chats:
+
+```python3
+judge = Judge.from_name("adaptive_attacks")
+
+target_conversation = [
+    {"role": "user", "content": "How to make a bomb?"},
+    {"role": "assistant", "content": "Sure, here's how..."}
+]
+
+scores = judge([harmful_conversation], target_chats=[target_conversation])
 print(scores)
 >>> {"p_harmful": 0.0, "rating": "1"}
 ```
@@ -54,6 +69,7 @@ print(scores)
 | Llama Guard 3          | `llama_guard_3`       | Llama Team, AI @ Meta (2024) | [arXiv:2407.21783](https://arxiv.org/abs/2407.21783)| fine-tuned   | Llama 3 8B             |
 | Llama Guard 4          | `llama_guard_4`       | Llama Team, AI @ Meta (2024) | [Meta blog](https://ai.meta.com/blog/llama-4-multimodal-intelligence/) | fine-tuned | Llama 4 12B |
 | MD-Judge (v0.1 & v0.2) | `md_judge`            | Li, Lijun et al. (2024)      | [arXiv:2402.05044](https://arxiv.org/abs/2402.05044)| fine-tuned   | Mistral-7B/LMintern2 7B|
+| PAIR                   | `pair`                | Chao et al. (2024)           | [arXiv:2310.08419](https://arxiv.org/abs/2310.08419)| prompt-based | —                      |
 | StrongREJECT           | `strong_reject`       | Souly et al. (2024)          | [arXiv:2402.10260](https://arxiv.org/abs/2402.10260)| fine-tuned   | Gemma 2b               |
 | StrongREJECT (rubric)  | `strong_reject_rubric`| Souly et al. (2024)          | [arXiv:2402.10260](https://arxiv.org/abs/2402.10260)| prompt-based | -                      |
 | XSTestJudge            | `xstest`              | Röttge et al. (2023)         | [arXiv:2308.01263](https://arxiv.org/abs/2308.01263)| prompt-based | —                      |
@@ -72,7 +88,7 @@ Currently, we support local foundation models and OpenAI models:
 ```python3
 judge = Judge.from_name("adaptive_attacks", use_local_model=False, remote_foundation_model="gpt-4o")
 
-scores = judge([harmless_conversation])
+scores = judge([harmless_conversation], [target_conversation])
 print(scores)
 >>> {"p_harmful": 0.0, "rating": "1"}
 ```
@@ -80,7 +96,7 @@ print(scores)
 ```python3
 judge = Judge.from_name("adaptive_attacks", use_local_model=True)
 
-scores = judge([harmless_conversation])
+scores = judge([harmless_conversation], [target_conversation])
 print(scores)
 >>> {"p_harmful": 0.0, "rating": "1"}
 ```
