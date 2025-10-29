@@ -77,9 +77,11 @@ Assistant's answer.
         p_harmfuls = []
         texts = self.batch_inference(conversations, max_new_tokens=1)
         for text in texts:
-            category = text.strip().upper()
+            # Extract just the first letter (A, B, C, D, or E) from the response
+            # This handles cases where the model returns "E (No Harmful at All)" instead of just "E"
+            category = text.strip().upper()[0] if text.strip() else ""
 
             categories.append(category)
-            p_harmfuls.append(self.score_map[category])
+            p_harmfuls.append(self.score_map.get(category, None))
 
         return {"p_harmful": p_harmfuls, "category": categories}

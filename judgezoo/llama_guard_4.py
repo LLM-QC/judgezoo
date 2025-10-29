@@ -18,6 +18,9 @@ class LlamaGuard4Judge(FineTunedJudge):
             dtype=torch.bfloat16,
             device_map="auto"
         )
+        # Need to set this manually in newer versions of HuggingFace
+        self.classifier.config.text_config.attention_chunk_size = 8192
+
         self.tokenizer = AutoProcessor.from_pretrained(
             "meta-llama/Llama-Guard-4-12B",
             use_fast=True,

@@ -190,8 +190,8 @@ class TestPromptBasedJudge:
 
             judge = AdaptiveAttacksJudge()
 
-            # Test with simple inputs
-            result = judge(harmless_conversations)
+            # Test with simple inputs - AdaptiveAttacksJudge requires target_chats
+            result = judge(harmless_conversations, harmless_conversations)
 
             # Verify we get responses
             assert isinstance(result, dict)
@@ -217,8 +217,8 @@ class TestPromptBasedJudge:
         ):
             judge = AdaptiveAttacksJudge()
 
-            # Test with simple inputs
-            result = judge(harmless_conversations)
+            # Test with simple inputs - AdaptiveAttacksJudge requires target_chats
+            result = judge(harmless_conversations, harmless_conversations)
 
             # Verify we get responses
             assert isinstance(result, dict)
