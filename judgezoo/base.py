@@ -76,6 +76,10 @@ class Judge(abc.ABC):
                 from .xstest import XSTestJudge
 
                 return XSTestJudge(**kwargs)
+            case "wildguard":
+                from .wildguard import WildGuardJudge
+
+                return WildGuardJudge(**kwargs)
             case _:
                 raise ValueError(f"Unknown judge {name}")
 

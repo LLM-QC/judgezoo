@@ -36,6 +36,7 @@ dependencies = [
     "ipykernel",
     "peft",
     "sentencepiece",
+    "protobuf",
 ]
 
 [project.optional-dependencies]

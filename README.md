@@ -31,7 +31,7 @@ print(scores)
 ```
 All judges return `"p_harmful"`, which is a normalized score from 0 to 1.
 Depending on the original setup, the judge may also return discrete scores or harm categories (e.g. on a Likert scale).
-In these cases, the raw scores are also returned:
+In these cases, the raw scores or additional evaluation metrics are also returned:
 
 ```python3
 judge = Judge.from_name("strong_reject")
@@ -39,6 +39,14 @@ judge = Judge.from_name("strong_reject")
 scores = judge([harmful_conversation])
 print(scores)
 >>> {"p_harmful": 0.9, "rating": "5"}
+```
+
+```python3
+judge = Judge.from_name("wildguard")
+
+scores = judge([harmful_conversation])
+print(scores)
+>>> {"p_harmful": 0.95, "p_harmful_request": 0.98, "p_refusal": 0.02}
 ```
 
 Some judges may have additional API requirements. For example, the Adaptive Attacks judge requires target chats:
@@ -72,6 +80,7 @@ print(scores)
 | PAIR                   | `pair`                | Chao et al. (2024)           | [arXiv:2310.08419](https://arxiv.org/abs/2310.08419)| prompt-based | —                      |
 | StrongREJECT           | `strong_reject`       | Souly et al. (2024)          | [arXiv:2402.10260](https://arxiv.org/abs/2402.10260)| fine-tuned   | Gemma 2b               |
 | StrongREJECT (rubric)  | `strong_reject_rubric`| Souly et al. (2024)          | [arXiv:2402.10260](https://arxiv.org/abs/2402.10260)| prompt-based | -                      |
+| WildGuard            | `wildguard`           | Han et al. (2024)            | [arXiv:2406.18495](https://arxiv.org/abs/2406.18495)| fine-tuned   | Mistral 7B             |
 | XSTestJudge            | `xstest`              | Röttge et al. (2023)         | [arXiv:2308.01263](https://arxiv.org/abs/2308.01263)| prompt-based | —                      |
 
 \* there are two versions of this judge (permissive and defensive). You can switch between them using `Judge.from_name("aegis_guard", defensive=[True/False])`
