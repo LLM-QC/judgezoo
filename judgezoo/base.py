@@ -72,6 +72,10 @@ class Judge(abc.ABC):
                 from .strong_reject import StrongRejectRubricJudge
 
                 return StrongRejectRubricJudge(**kwargs)
+            case "wildguard":
+                from .wildguard import WildGuardJudge
+
+                return WildGuardJudge(**kwargs)
             case "xstest":
                 from .xstest import XSTestJudge
 
