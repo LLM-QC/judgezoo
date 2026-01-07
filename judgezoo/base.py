@@ -72,14 +72,14 @@ class Judge(abc.ABC):
                 from .strong_reject import StrongRejectRubricJudge
 
                 return StrongRejectRubricJudge(**kwargs)
-            case "xstest":
-                from .xstest import XSTestJudge
-
-                return XSTestJudge(**kwargs)
             case "wildguard":
                 from .wildguard import WildGuardJudge
 
-                return WildGuardJudge(**kwargs)
+                return WildGuardJudge(**kwargs
+            case "xstest":
+                from .xstest import XSTestJudge
+
+                return XSTestJudge(**kwargs))
             case _:
                 raise ValueError(f"Unknown judge {name}")
 
